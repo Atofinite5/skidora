@@ -12,7 +12,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-10B981.svg?style=flat-square)](#verification)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [AG3 Loop](#the-ag3-execution-loop) • [Skills Matrix](#skills-matrix) • [Network & Jam Alt](#network--production-security-jamdev-alternatives) • [Helix Memory](#helix-memory-contract) • [Neovim & Rust](#neovim--rust-engine)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [AG3 Loop](#the-ag3-execution-loop) • [Skills Matrix](#skills-matrix) • [OpenReplay Spot & Security](#network--production-security-openreplay-spot-standard) • [Helix Memory](#helix-memory-contract) • [Neovim & Rust](#neovim--rust-engine)
 
 </div>
 
@@ -27,7 +27,7 @@ AI coding assistants are brilliant at writing syntax, but catastrophic at mainta
 | **Context Amnesia** | Agent resets every chat turn; forgets architecture and previously made decisions. | **Helix Memory Engine:** Auto-loads `.skidora/recover.md` at session start and commits running progress to `.skidora/draft.md`. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A checks code AST/routes; Pass B requires real shell/curl execution proof. No proof = not done. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
-| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Network & Security Auditing:** Enforces timeout resilience, origin whitelisting, no credentials in URLs, and open-source Jam bug repros. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Network & Security Auditing:** Enforces timeout resilience, origin whitelisting, no credentials in URLs, and standardized OpenReplay Spot traces. |
 | **Silent Regression** | Fixes one function while breaking three others without running existing test suites. | **Bounded Retry CD Loop:** Runs test gates repeatedly; mandates a **95+ quality score** before reporting complete. |
 | **Context Bloat & Lag** | 5,000-line skill prompts cause slow agent responses and severe attention dilution. | **When-Not Gate:** Skips overhead on trivial one-liners; loads strictly one specialized module per turn. |
 
@@ -111,7 +111,7 @@ Skidora is modular. Use the orchestrator for full automation, or install individ
 | **`skidora-gsd`** | [`skills/skidora-gsd`](./skills/skidora-gsd) | **Execution Bars:** Live project status (`Phase`, `Done`, `Blocked`, `Next`) and on-demand tools. |
 | **`skidora-frontend`** | [`skills/skidora-frontend`](./skills/skidora-frontend) | **UI Standards:** Design tokens, layout hierarchy, and component composition rules. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; strictly no invented endpoints. |
-| **`skidora-network`** | [`skills/skidora-network`](./skills/skidora-network) | **Network & Security:** CORS, timeouts, open-source Jam alternatives (OpenReplay Spot, Highlight.io), and leak prevention. |
+| **`skidora-network`** | [`skills/skidora-network`](./skills/skidora-network) | **Network & Security:** CORS, timeouts, OpenReplay Spot standard (open-source Jam alternative), and leak prevention. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP:** Phoenix, LiveView, Mix/Rebar3 concurrency, and supervisor patterns. |
 | **`skidora-cd`** | [`skills/skidora-cd`](./skills/skidora-cd) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
 | **`skidora-graphifier`** | [`skills/skidora-graphifier`](./skills/skidora-graphifier) | **Topic Topology:** Reconstructs node and edge graphs when code is torn or context is ambiguous. |
@@ -121,17 +121,16 @@ Skidora is modular. Use the orchestrator for full automation, or install individ
 
 ---
 
-## 🌐 Network & Production Security (Jam.dev Alternatives)
+## 🌐 Network & Production Security (OpenReplay Spot Standard)
 
-When debugging network failures, console errors, or bug reports:
+When debugging network failures, console errors, or bug reports, Skidora standardizes on **OpenReplay Spot** as the definitive open-source alternative to Jam.dev:
 
-### Open-Source Jam Alternatives
-* **OpenReplay Spot** (`openreplay/openreplay`): Direct open-source browser extension alternative to Jam.dev. Bundles console logs, network payloads, and user actions with 100% self-hosted privacy.
-* **Highlight.io** (`highlight/highlight`): Full-stack open-source session replay and network payload inspection.
-* **Crikket** (`redpangilinan/crikket`): Self-hostable bug-reporting tool with automated console & network capture.
-* **mitmproxy** (`mitmproxy/mitmproxy`): Interactive HTTPS network inspection for CLI and backend API debugging.
+### Why OpenReplay Spot ⭐
+* **1:1 Open-Source Jam Alternative:** Direct Chrome extension that captures console logs, complete network request/response waterfalls, and user DOM interactions in one click.
+* **100% Self-Hostable:** Zero third-party cloud data leakage; protects proprietary company APIs, tokens, and sensitive client information.
+* **Native Agent Ingestion:** Skidora agents (Gemini, Claude, Cursor, Antigravity) ingest Spot network traces to map failing endpoints directly to the router and handlers without hallucination.
 
-### Production Network Defense
+### Production Network Hardening Rules
 1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
 2. **Strict CORS Policy:** Whitelist specific origins. Never combine wildcard `*` with `credentials: true`.
 3. **Mandatory Timeouts:** Every network request must have an explicit timeout (5s–10s) and exponential backoff retry.

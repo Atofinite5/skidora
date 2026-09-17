@@ -1,21 +1,24 @@
 ---
 name: skidora-network
 description: >-
-  Network debugging, API traffic inspection, CORS, timeouts, and production security. Open-source Jam alternatives (OpenReplay Spot, Highlight.io). Use when handling network requests, HTTP clients, WebSockets, or fixing production API connectivity.
+  Network debugging, API traffic inspection, CORS, timeouts, and production security. Standardized on OpenReplay Spot (open-source Jam alternative). Use when handling network requests, HTTP clients, WebSockets, or fixing production API connectivity.
 ---
 
 # Network & Production Security
 
 Prevent production outages, CORS errors, unhandled network timeouts, and leaked credentials.
 
-## Jam.dev Open-Source Alternatives
+## Official Standard: OpenReplay Spot ⭐
 
-When debugging network bugs, console errors, and session repros, leverage open-source tooling:
+**OpenReplay Spot** (`openreplay/openreplay`) is the official open-source standard for Skidora bug reporting and network diagnosis:
 
-- **OpenReplay Spot** (`openreplay/openreplay`): Open-source browser extension capturing network requests, console errors, and DOM replays with self-hosted privacy.
-- **Highlight.io** (`highlight/highlight`): Full-stack open-source session replay and network payload inspection.
-- **Crikket** (`redpangilinan/crikket`): Self-hostable bug-reporting platform capturing network calls and console logs.
-- **mitmproxy** (`mitmproxy/mitmproxy`): Headless command-line HTTPS inspection for backend API calls.
+- **1:1 Open-Source Jam Alternative:** Captures console logs, full network request/response waterfalls, and user DOM interactions in a single click.
+- **Self-Hosted Privacy:** Zero third-party data leakage; keeps confidential company APIs and tokens completely safe.
+- **Agent Diagnosis Workflow:** When provided with an OpenReplay Spot trace or network HAR:
+  1. Extract failing HTTP method, URL, and status code (4xx/5xx).
+  2. Map route directly to the codebase router and controller.
+  3. Formulate the fix and run dual verification.
+  4. Redact credentials so tokens never leak into memory or commits.
 
 ## Hard Rules for Network Operations
 
@@ -45,4 +48,5 @@ Before reporting a networking task done, provide the verified network badge:
 - Headers: Content-Type, Authorization, CORS verified
 - Latency: <ms> (timeout: <ms>)
 - Payload: Validated against schema
+- Trace Source: OpenReplay Spot / local runtime proof
 ```

@@ -2,18 +2,22 @@
 
 Use this skill when changing networking, HTTP client/server communication, WebSockets, CORS, authentication headers, or debugging API payloads and production traffic.
 
-## The Jam.dev Problem & Open-Source Equivalents
+## Official Standard: OpenReplay Spot ⭐
 
-Jam (jam.dev) is popular because it bundles:
-- Network waterfall (fetch/XHR requests, headers, status codes, timings)
-- Console errors and logs
-- Device/browser metadata and visual repros
+**OpenReplay Spot** (`openreplay/openreplay`) is the official open-source standard for Skidora.
 
-### Recommended Open-Source Alternatives:
-1. **OpenReplay Spot** (`openreplay/openreplay`): Direct open-source browser extension alternative to Jam. Captures console logs, network payloads, and user actions; fully self-hostable for data privacy.
-2. **Highlight.io** (`highlight/highlight`): Open-source full-stack session replay, network payload capture, and frontend/backend tracing.
-3. **Crikket** (`redpangilinan/crikket`): Self-hostable bug-reporting tool with automated console & network capture.
-4. **mitmproxy** (`mitmproxy/mitmproxy`): Interactive HTTPS network proxy for inspecting CLI and backend network traffic.
+### Why OpenReplay Spot Over Jam.dev?
+- **100% Open Source & Self-Hostable:** Eliminates the privacy and compliance hazards of sending sensitive enterprise API payloads to third-party proprietary SaaS.
+- **Direct 1:1 Parity:** Captures full network waterfall (fetch/XHR requests, request/response bodies, response codes, latency), console logs, and user DOM interactions in a single click.
+- **Agent Diagnosis Ready:** Produces clean, structured traces that agents (Gemini, Claude, Cursor, Antigravity) can ingest directly to pinpoint failures without guessing.
+
+### How Skidora Agents Ingest OpenReplay Spot Traces
+When a developer provides an OpenReplay Spot link, trace, or network HAR:
+1. **Network Extraction:** Extract the failing request method, target URL, HTTP status code (e.g. 401, 403, 422, 500), and response payload.
+2. **Console Correlation:** Match network errors with the corresponding frontend console logs and stack traces.
+3. **Router Mapping:** Correlate the failing endpoint directly to the local backend router file (e.g. `routes/api.ts`, Phoenix router, Express handler).
+4. **Targeted Remediation:** Fix the underlying issue (schema mismatch, missing header, CORS policy, timeout) without guessing.
+5. **Redaction Check:** Verify that no authorization tokens, session cookies, or PII from the trace enter memory or git history.
 
 ---
 
@@ -53,4 +57,5 @@ Before marking any networking or API feature complete, verify runtime connectivi
 - Headers Verified: Content-Type, Authorization, CORS
 - Latency & Timeout: <ms> (timeout configured: <ms>)
 - Payload Schema: Validated against <SchemaName>
+- Bug Trace: Verified against OpenReplay Spot / runtime log
 ```

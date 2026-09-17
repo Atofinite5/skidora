@@ -127,7 +127,7 @@ Skidora is modular. Use the orchestrator for full automation, or install individ
 | **`skidora-frontend`** | [`skills/skidora-frontend`](./skills/skidora-frontend) | **UI Standards:** Design tokens, layout hierarchy, and component composition rules. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; strictly no invented endpoints. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP:** Phoenix, LiveView, Mix/Rebar3 concurrency, and supervisor patterns. |
-| **`skidora-cd`** | [`skills/skidora-cd`](./skills/cd-pipelines.md) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
+| **`skidora-cd`** | [`skills/skidora-cd`](./skills/skidora-cd) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
 | **`skidora-graphifier`** | [`skills/skidora-graphifier`](./skills/skidora-graphifier) | **Topic Topology:** Reconstructs node and edge graphs when code is torn or context is ambiguous. |
 | **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification targeting a 95+ score on repository test suites. |
 | **`skidora-security`** | [`skills/skidora-security`](./skills/skidora-security) | **Safety First:** Zero credentials in memory files; explicit user authorization for destructive ops. |

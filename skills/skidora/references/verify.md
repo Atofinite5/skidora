@@ -1,45 +1,26 @@
-# Verify
+# Verify & Proof-of-Work Reference
 
-No done without evidence. Recheck twice. Target 95-plus on the project's own checks.
+Blueprint Mode requires dual-pass verification and the 3-line Proof-of-Work Badge.
 
-## 95-plus
+## Standardized Badge
 
-Use the repo's real gate: test, lint, typecheck, build, or a documented script.
-
-- If a numeric coverage/score exists, require >= 95 on the touched area or the project's stated threshold, whichever is documented.
-- If no numeric score exists, 95-plus means: all in-scope checks pass, and a second pass found no remaining in-scope failures.
-- Never invent a score.
-
-## Double-check
-
-For every requirement in the plan:
-
-1. Pass A — implement and run the check.
-2. Pass B — independently confirm (re-read the file, re-hit the endpoint, re-run the test). Do not treat pass A logs as pass B.
-
-For every in-scope API/endpoint:
-
-1. Pass A — route exists in code (registration + handler).
-2. Pass B — runtime proof (test or curl or project equivalent).
-
-If A and B disagree, it is not done. Enter the retry loop in [cd-pipelines.md](cd-pipelines.md).
-
-## No hallucination
-
-Before stating a fact:
-
-- File exists → Read or Glob succeeded
-- Endpoint exists → found in router or live call
-- Component exists → opened the source
-- "Tests pass" → command output in this turn
-- BEAM: [erlang-elixir.md](erlang-elixir.md) — `mix test` or `rebar3` twice, plus router/child-spec proof
-
-If you cannot prove it, say it is unverified.
-
-## Done bar
-
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): <file>:<line> — Route registered in router with schema validation.
+- Pass B (Runtime): <command> -> exit 0 (e.g. curl -s -o /dev/null -w "%{http_code}" <URL> -> 200 OK)
+- Regression: <X/X tests passing> (0 failures)
 ```
-Verify: pass A <cmd/result>; pass B <cmd/result>
-Score: <number or "all in-scope green">
-Endpoints: <list with method path and proof>
-```
+
+## Network Input Parsing
+
+Support four standard network debugging formats:
+1. **Jam URL:** Ingest bug URL, extract failing route, status code, and payload.
+2. **HAR File:** Filter for HTTP $\ge 400$, inspect request headers and response body.
+3. **OpenReplay Spot:** Correlate user DOM action with network waterfall failure.
+4. **cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
+
+## Bounded Retry Loop
+
+- Retry failed checks up to **3 times**.
+- Each retry must follow the 7-Rung Ladder (KISS, DRY).
+- If failure persists after 3 attempts, halt immediately and mark `Blocked: <reason>` in `.skidora/recover.md`.

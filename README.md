@@ -12,7 +12,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-10B981.svg?style=flat-square)](#verification)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine-the-7-rung-ladder--core-principles) • [AG3 Loop](#-the-adaptive-ag3-loop) • [Skills Matrix](#-skills-matrix-15-specialized-modules) • [OpenReplay Spot & Network](#-network--production-security-openreplay-spot-standard) • [Helix Memory](#-helix-single-file-memory-contract)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, 7-Rung)](#-adaptive-engine-the-7-rung-ladder--core-principles) • [AG3 Loop](#-the-adaptive-ag3-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract)
 
 </div>
 
@@ -28,7 +28,7 @@ AI coding assistants are brilliant at syntax, but catastrophic at engineering di
 | **Context Amnesia** | Agent resets every chat turn; forgets past architecture decisions and repeats previous bugs. | **Single-File Helix Memory:** Silent, background persistence in `.skidora/recover.md`. Zero file bloat. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A checks code AST/routes; Pass B requires real shell/curl execution proof. No proof = not done. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
-| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Network & Security Auditing:** Standardizes on **OpenReplay Spot ⭐** traces, strict CORS whitelists, and mandatory timeouts. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Multi-Format Network Ingestion:** Ingests Jam URLs, HAR dumps, OpenReplay Spot, or curl traces; enforces timeouts and CORS defense. |
 | **Code Bloat & Reinvented Wheels** | Agents install new libraries for things that take 2 lines of standard library code. | **YAGNI, KISS & DRY Enforcement:** Reuses existing utilities and stdlib; halts at the lowest rung that holds. |
 
 ---
@@ -41,12 +41,6 @@ Skidora bakes timeless software engineering principles directly into agent promp
 1. **YAGNI (You Aren't Gonna Need It):** Never generate speculative abstractions or unrequested documentation files.
 2. **KISS ("Do It Simple"):** The shortest working diff that solves the root cause wins. Avoid over-engineering.
 3. **DRY ("Do It Once"):** Reuse existing codebase helpers and standard libraries. In memory, maintain **one single `.skidora/recover.md`** ledger instead of duplicating state across multiple files.
-4. **SOLID Design Principles:**
-   - **Single Responsibility (S):** Each change and function does one thing cleanly.
-   - **Open/Closed (O):** Extend capabilities without mutating stable contracts.
-   - **Liskov Substitution (L):** New implementations remain 100% drop-in compatible.
-   - **Interface Segregation (I):** No developer is forced to endure paperwork ceremonies for daily bug fixes.
-   - **Dependency Inversion (D):** Business logic depends on routers and abstractions, not fragile hardcoded bindings.
 
 ### The 7-Rung Ladder of Laziness (Default Daily Driver)
 Before generating any new code, the agent steps down the ladder and **stops at the first rung that holds**:
@@ -62,21 +56,19 @@ Before generating any new code, the agent steps down the ladder and **stops at t
 
 ## 🚀 Quickstart
 
-Install the complete Skidora pack into all your coding agents globally with one command:
+Install the core Skidora pack globally across all your coding agents:
 
 ```bash
-npx skills add Atofinite5/skidora --skill '*' -g -y
+npx skills add Atofinite5/skidora -g -y
 ```
 
-### Pick Specific Modules
+### For Cursor Users (Native Path Verification)
+Cursor reads global skills from `~/.cursor/skills/`. Run this 1-line command to install and verify native Cursor discovery:
 
 ```bash
-npx skills add Atofinite5/skidora \
-  -s skidora,skidora-when-not,skidora-helix,skidora-frontend,skidora-backend,skidora-network,skidora-verify \
-  -g \
-  -a cursor -a claude-code -a antigravity -a zed -a github-copilot \
-  -y
+curl -fsSL https://raw.githubusercontent.com/Atofinite5/skidora/main/scripts/install.sh | bash
 ```
+*(After installing, reload Cursor window: `Cmd+Shift+P` -> "Developer: Reload Window" or restart Cursor).*
 
 ### Inspect the Pack
 
@@ -102,7 +94,7 @@ flowchart TD
   
   isStructural -->|Yes (10% Structural)| blueprint["🛡️ BLUEPRINT MODE (Skidora Deep)
 - 1. Load Helix recover.md
-- 2. Intake: Ask missing P0 blockers
+- 2. Ask missing P0 blockers
 - 3. Architecture Blueprint before presentation
 - 4. NLP-to-Endpoint mapping (real routers only)
 - 5. Dual-Pass Verification (Pass A AST + Pass B Runtime curl)
@@ -111,38 +103,30 @@ flowchart TD
 
 ---
 
-## 🧩 Skills Matrix (15 Specialized Modules)
+## 🧩 Core Skills Matrix
 
-Skidora is modular. Use the orchestrator for full automation, or install individual modules via `-s <name>`:
+Skidora collapsed satellite bloat into **4 high-impact, non-contradictory core skills** (+1 optional BEAM skill):
 
 | Skill | Module Directory | Core Capability |
 |---|---|---|
-| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, architecture gates, and multi-skill dispatch. |
-| **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Ponytail 7-Rung Ladder, YAGNI, KISS, DRY, and SOLID principles. |
-| **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md`. |
-| **`skidora-network`** | [`skills/skidora-network`](./skills/skidora-network) | **Network & Security:** CORS, timeouts, OpenReplay Spot standard (open-source Jam alternative). |
-| **`skidora-intake`** | [`skills/skidora-intake`](./skills/skidora-intake) | **Structured Discovery:** Standardized P0 (blockers), P1 (quality), P2 (optional) question block. |
-| **`skidora-planning`** | [`skills/skidora-planning`](./skills/skidora-planning) | **Architecture First:** Layout & data-flow before demo; internal hidden plan if requested. |
-| **`skidora-gsd`** | [`skills/skidora-gsd`](./skills/skidora-gsd) | **Execution Bars:** Live project status (`Phase`, `Done`, `Blocked`, `Next`) and on-demand tools. |
-| **`skidora-frontend`** | [`skills/skidora-frontend`](./skills/skidora-frontend) | **UI Standards:** Design tokens, layout hierarchy, and component composition rules. |
-| **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; strictly no invented endpoints. |
-| **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP:** Phoenix, LiveView, Mix/Rebar3 concurrency, and supervisor patterns. |
-| **`skidora-cd`** | [`skills/skidora-cd`](./skills/skidora-cd) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
-| **`skidora-graphifier`** | [`skills/skidora-graphifier`](./skills/skidora-graphifier) | **Topic Topology:** Reconstructs node and edge graphs when code is torn or context is ambiguous. |
-| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification targeting a 95+ score on repository test suites. |
-| **`skidora-security`** | [`skills/skidora-security`](./skills/skidora-security) | **Safety First:** Zero credentials in memory files; explicit user authorization for destructive ops. |
-| **`skidora-agent-handling`** | [`skills/skidora-agent-handling`](./skills/skidora-agent-handling) | **Agent Persona:** Factual, concise, and professional tone with zero AI fluff or apologetic chatter. |
+| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, and multi-skill dispatch. |
+| **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Ponytail 7-Rung Ladder, YAGNI, KISS, DRY (≤3 lines output). |
+| **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md` (<40 lines). |
+| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass AST + runtime proof, network trace parsing, and 3-line badge. |
+| **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; in-memory torn router resolution. |
+| **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (Optional):** Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
 
 ---
 
-## 🌐 Network & Production Security (OpenReplay Spot Standard)
+## 🌐 Network Debugging & Production Security
 
-When debugging network failures, console errors, or bug reports, Skidora standardizes on **OpenReplay Spot** as the definitive open-source alternative to Jam.dev:
+When debugging network failures, console errors, or bug reports, Skidora agents natively ingest traces in any standard format:
 
-### Why OpenReplay Spot ⭐
-* **1:1 Open-Source Jam Alternative:** Direct Chrome extension that captures console logs, complete network request/response waterfalls, and user DOM interactions in one click.
-* **100% Self-Hostable:** Zero third-party cloud data leakage; protects proprietary company APIs, tokens, and sensitive client information.
-* **Native Agent Ingestion:** Skidora agents ingest Spot network traces to map failing endpoints directly to the router and handlers without hallucination.
+### Multi-Format Input Support
+* **Jam.dev URLs:** Parses bug recording URLs to extract failing endpoints, status codes, and request bodies.
+* **HAR Dumps / DevTools:** Filters entries with `response.status >= 400` to pinpoint failed network requests.
+* **OpenReplay Spot ⭐:** Integrates DOM replay clicks with backend network waterfalls.
+* **cURL Commands:** Reproduces failed network traffic directly via local CLI execution.
 
 ### Production Network Hardening Rules
 1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
@@ -159,7 +143,7 @@ Skidora eliminates both context amnesia AND markdown bloat by keeping **one sing
 ```
 your-project/
 └── .skidora/
-    └── recover.md       # Single-file compact ledger: past milestones & active state
+    └── recover.md       # Single-file compact ledger (<40 lines): past milestones & active state
 ```
 
 ### Clean, Silent Updates
@@ -184,28 +168,24 @@ cargo build --release
 
 # Run CLI commands directly
 ./target/release/skidora status
-./target/release/skidora draft --phase execute --title "Add Stripe webhook"
 ./target/release/skidora recover --global
 ```
 
 In Neovim:
 ```vim
-:SkidoraStatus    " View project bars in a floating window
-:SkidoraDraft     " Append log entry with execution proof
+:SkidoraStatus    " View project status in a floating window
 :SkidoraRecover   " Inspect the compressed recovery prompt
-:SkidoraGraph     " View topological node map
 ```
 
 ---
 
 ## 🛡️ The Zero-Slop Guarantee
 
-Before your agent claims an API or structural feature is "finished", Skidora forces it to provide this standardized **Proof-of-Work Badge**:
+Before your agent claims an API or structural feature is "finished", Skidora forces it to provide this standardized **Proof-of-Work Badge** ([templates/proof-of-work.md](templates/proof-of-work.md)):
 
 ```markdown
 [Skidora Proof-of-Work]
-- Route: POST /api/v1/billing/webhook (verified in app/api/billing/route.ts:42)
-- Pass A (Static): Route registered in router with Zod schema validation.
+- Pass A (Static): POST /api/v1/billing/webhook (app/api/billing/route.ts:42)
 - Pass B (Runtime): curl -X POST http://localhost:3000/api/v1/billing/webhook -> 200 OK
 - Regression: 14/14 tests green (0 failures)
 ```

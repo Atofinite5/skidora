@@ -1,58 +1,33 @@
 ---
 name: skidora-backend
 description: >-
-  Backend APIs and NLP-to-endpoint mapping. Use when changing routes, handlers, or mapping user language to endpoints.
+  Backend APIs, NLP-to-endpoint mapping, and torn router resolution. Zero invented routes; maps natural language to real router handlers with schema validation.
 ---
 
-# Backend and NLP-to-endpoints
+# Backend & NLP-to-Endpoints
 
-Use this when the request touches APIs, services, jobs, auth, data, or mapping user language to routes.
+Enforce zero-hallucination routing: an endpoint is real ONLY if it exists in router code, an OpenAPI/schema spec, or a verified live route table.
 
-## Hard rule
+## NLP -> Real Route Mapping
 
-An endpoint is real only if it exists in code, an OpenAPI/spec file, or a live server you just called. Do not invent paths, methods, or payloads.
+User language is not a technical spec. Map intent to real router files before touching any code:
 
-## Before editing
+1. Extract intent, entity, and constraints from the prompt.
+2. Match to an existing handler and router file by name, path, or schema.
+3. If no match exists, flag as a Blueprint task (new endpoint). Never silently invent a path.
+4. Record verified route in `.skidora/recover.md`:
+   `Route: <METHOD> <path> -> <handler file:line>`
 
-1. Find the HTTP/router layer, handlers, and schema validation in this repo.
-2. List current routes that match the request.
-3. Read Helix recover for previously verified endpoints.
-4. If `mix.exs`, `rebar.config`, or `.erl`/`.ex` sources exist, also read [erlang-elixir.md](erlang-elixir.md) and follow OTP/Phoenix rules there.
+## Torn Router Resolution (In-Memory Graph)
 
-## NLP → endpoint
+When a codebase has torn routes, dual backends, or conflicting middleware:
+1. Scan router files (`src/routes/*`, `app/api/*`, `router.ex`).
+2. Build an in-memory route dependency map: `Route -> Middleware/Auth -> Controller/Handler -> Database/Store`.
+3. Resolve conflicts at the router level. Do NOT write external `graph.md` files unless explicitly requested.
 
-User text is not a spec. Map it:
+## Backend Hardening Rules
 
-1. Extract intent (create/modify/remove/query), entity, and constraints from the message.
-2. Match to an existing handler/route by name, path, or schema.
-3. If no match: that is a P0 (add a new endpoint vs reuse). Do not silently create.
-4. Once matched or created, write the mapping into `.skidora/draft.md`:
-
-```
-NLP: "<user phrase>" -> <METHOD> <path> (<handler file>)
-```
-
-Keep mappings stable so recover can restore them.
-
-## Endpoint work
-
-- Validate input with the project's existing schema library.
-- Errors: explicit status codes, no leaked stack/secrets.
-- Side effects (mail, payments, deletes) stay behind explicit user intent.
-- CD and jobs: [cd-pipelines.md](cd-pipelines.md).
-
-## Architecture to show
-
-- Module map (router → handler → store)
-- Sequence for the main request
-- Table of endpoints in scope (method, path, auth, change: add/edit/remove)
-- How NLP phrases map to those rows
-
-## Verify twice
-
-For each in-scope endpoint:
-
-1. Static: handler file, route registration, schema.
-2. Runtime: project test, curl, or equivalent against the running or test server.
-
-Both must pass. See [verify.md](verify.md). If either fails, retry loop — do not report done.
+- **Schema Validation:** Always validate incoming payloads using the project's existing schema library (Zod, Joi, Pydantic, Ecto).
+- **Network Resilience:** Enforce explicit 5s–10s timeouts and sanitized error responses.
+- **Zero Secrets in Logs:** Never log authorization headers, passwords, or tokens.
+- **Side Effects Guard:** Mutations, webhooks, or deletions require explicit verification.

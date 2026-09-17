@@ -1,48 +1,19 @@
-# Neovim and Rust
+# Neovim & Rust Reference
 
-Use this when the user works in Neovim, asks for the Skidora CLI, Helix memory files on disk, or a Rust change to this repo.
+The Rust CLI and Neovim plugin provide local manipulation of Helix memory files (`.skidora/recover.md`).
 
-Cursor still loads [`SKILL.md`](../SKILL.md). This module is the native runtime that **writes the same files**.
-
-## Binary
-
-From the Skidora source repo:
-
-```bash
-cargo install --path crates/skidora-cli
-```
-
-Or run without installing: `cargo run -p skidora -- <args>`.
-
-Override skill pack location with `SKIDORA_HOME` (default `~/.cursor/skills/skidora`).
-
-| Command | Effect |
-|---|---|
-| `skidora init --path <root>` | Create `.skidora/` if missing |
-| `skidora status --path <root>` | Print Phase / Done / Blocked / Next |
-| `skidora draft --phase execute --title "..." --intent "..." --did "..."` | Append one Helix log entry |
-| `skidora recover --path <root>` | Print tiny recover prompt |
-| `skidora recover --goal "..." --next "..." --global` | Rewrite recover + upsert skill `memory/` |
-| `skidora graph --question "..."` | Write Graphifier skeleton |
-
-If `skidora` is on PATH, prefer it over hand-editing `.skidora/` so Neovim and the agent stay in sync. Still **Read** the files after the command for evidence.
-
-## Neovim
-
-Plugin root: `nvim/` in this repo.
+## Neovim Setup
 
 ```lua
-vim.opt.runtimepath:prepend("/Users/bhargavkalambhe/Desktop/skidora/nvim")
--- optional: vim.g.skidora_bin = "/path/to/skidora"
--- optional: vim.g.skidora_autostatus = false
+vim.opt.runtimepath:prepend("/path/to/skidora/nvim")
 ```
 
-Commands: `:SkidoraInit` `:SkidoraStatus` `:SkidoraDraft` `:SkidoraRecover` `:SkidoraGraph [question]`
+Commands: `:SkidoraInit`, `:SkidoraStatus`, `:SkidoraRecover`.
 
-On `VimEnter` / `DirChanged`, if `.skidora/draft.md` exists, show the four bars.
+On `VimEnter` / `DirChanged`, if `.skidora/recover.md` exists, status is displayed.
 
-## Agent rules
+## Agent Rules
 
-- Do not invent a second memory format. Files stay as [helix-memory.md](helix-memory.md).
-- After CLI writes, re-read `.skidora/recover.md` or `draft.md` (pass B).
-- Rust changes in this repo: `cargo test` is pass A; a second `cargo test` or re-run of the same failing test after the fix is pass B.
+- Do not invent a second memory format. Single-file memory lives in `.skidora/recover.md`.
+- After CLI writes, re-read `.skidora/recover.md` (pass B).
+- Rust changes in this repo: `cargo test` is pass A; a second `cargo test` after the fix is pass B.

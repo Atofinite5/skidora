@@ -1,14 +1,7 @@
-# AGENTS
+# Skidora Agent Protocol (Append to your AGENTS.md)
 
-This project uses **Skidora** (markdown Helix files in `.skidora/`). No CLI required.
-
-## Every session
-
-1. If `.skidora/recover.md` exists, read it first. Continue from **Next**. If the task is full work and `.skidora/` is missing, create it from the Skidora templates.
-2. If the task is small (typo, one-line, "where is X?"), skip plan and architecture. See skill `skidora-when-not`.
-3. Otherwise follow Skidora AG3: intake → plan (hide if the user said don't plan) → architecture before presentation → implement → verify twice.
-4. Before you stop: append `.skidora/draft.md` and rewrite `.skidora/recover.md`.
-
-Skill pack: `SKILL.md` in the installed `skidora` skill, or this repo's copy if vendored.
-
-Do not invent files, routes, or APIs. One module per turn. No secrets in `.skidora/`.
+This project operates under the **Skidora Operating System**:
+- **Surgical Mode (Default):** Run the 7-Rung Ladder (YAGNI, KISS, DRY). Shortest working diff wins. Max 3 lines of chat output. Silent 1-line append to `.skidora/recover.md`.
+- **Blueprint Mode (Structural):** Public APIs, DB schemas, or boundary changes require dual-pass verification (Pass A AST file:line + Pass B runtime command) and the 3-line Proof-of-Work Badge.
+- **Single-File Memory:** All cross-session state lives in `.skidora/recover.md` (<40 lines). Never create `draft.md` or `plan.md`.
+- **Zero Hallucination:** Every endpoint must exist in physical router code.

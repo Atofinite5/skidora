@@ -1,51 +1,45 @@
 ---
 name: skidora-verify
 description: >-
-  Double-check and 95-plus. Use when claiming tests or endpoints work.
+  Dual-pass verification: Pass A AST file:line, Pass B command+exit runtime proof, multi-format network input parsing (Jam, HAR, Spot, curl), and bounded retry loop.
 ---
 
-# Verify
+# Verify & Proof-of-Work
 
-No done without evidence. Recheck twice. Target 95-plus on the project's own checks.
+No completion without evidence. Recheck twice. Blueprint mode requires the standardized 3-line Proof-of-Work badge.
 
-## 95-plus
+## Dual-Pass Verification
 
-Use the repo's real gate: test, lint, typecheck, build, or a documented script.
+For every endpoint, schema migration, or public contract change:
+1. **Pass A (Static AST Proof):** Identify exact `<file>:<line>` where route/schema is declared and validated.
+2. **Pass B (Runtime Execution Proof):** Run tests or execute curl/CLI command with exit code 0.
 
-- If a numeric coverage/score exists, require >= 95 on the touched area or the project's stated threshold, whichever is documented.
-- If no numeric score exists, 95-plus means: all in-scope checks pass, and a second pass found no remaining in-scope failures.
-- Never invent a score.
+If Pass A and Pass B disagree, the work is NOT done.
 
-## Double-check
+## Standardized Proof-of-Work Badge
 
-For every requirement in the plan:
+See [templates/proof-of-work.md](../templates/proof-of-work.md):
 
-1. Pass A — implement and run the check.
-2. Pass B — independently confirm (re-read the file, re-hit the endpoint, re-run the test). Do not treat pass A logs as pass B.
-
-For every in-scope API/endpoint:
-
-1. Pass A — route exists in code (registration + handler).
-2. Pass B — runtime proof (test or curl or project equivalent).
-
-If A and B disagree, it is not done. Enter the retry loop in [cd-pipelines.md](cd-pipelines.md).
-
-## No hallucination
-
-Before stating a fact:
-
-- File exists → Read or Glob succeeded
-- Endpoint exists → found in router or live call
-- Component exists → opened the source
-- "Tests pass" → command output in this turn
-- BEAM: [erlang-elixir.md](erlang-elixir.md) — `mix test` or `rebar3` twice, plus router/child-spec proof
-
-If you cannot prove it, say it is unverified.
-
-## Done bar
-
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): <file>:<line> — Route registered in router with schema validation.
+- Pass B (Runtime): <command> -> exit 0 (e.g. curl -s -o /dev/null -w "%{http_code}" <URL> -> 200 OK)
+- Regression: <X/X tests passing> (0 failures)
 ```
-Verify: pass A <cmd/result>; pass B <cmd/result>
-Score: <number or "all in-scope green">
-Endpoints: <list with method path and proof>
-```
+
+## Multi-Format Network Debugging
+
+Accept network traces in any standard format:
+- **Jam.dev Recording:** Extract failing URL, HTTP method, status code, and payload from Jam URL/metadata.
+- **HAR Dump / DevTools:** Filter entries with `response.status >= 400`. Inspect headers and response body.
+- **OpenReplay Spot:** Correlate user DOM click with network waterfall error.
+- **cURL Command:** Reproduce locally via `curl -v -X <METHOD> <URL>`.
+
+Sanitize bearer tokens and passwords before logging. Never store secrets in `.skidora/recover.md`.
+
+## Bounded CD Retry Loop
+
+If verification fails:
+1. Analyze compiler error, status code, or test failure diff.
+2. Apply minimal targeted fix using 7-Rung Ladder.
+3. Max **3 retries**. If still failing after 3 attempts, halt and mark status as `Blocked` in `.skidora/recover.md`.

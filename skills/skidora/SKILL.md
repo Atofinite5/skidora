@@ -1,104 +1,103 @@
 ---
 name: skidora
 description: >-
-  Portable agent skill for any coding agent and any project (Cursor, Claude
-  Code, Codex, Copilot, Neovim, others). Adaptive execution (Ponytail 7-Rung
-  Ladder, YAGNI, KISS, DRY, SOLID), single-file Helix recover memory, GSD,
-  NLP-to-endpoints, CD retry loops, OpenReplay Spot network inspection, and
-  dual-pass verification. Use when starting or continuing a project, recovering
-  past work, building frontend or backend, mapping NLP to endpoints,
-  automations, CD, architecture before presentation, network/API inspection,
-  or when the user mentions Skidora, Helix memory, Graphifier, GSD, Neovim,
-  Erlang, Elixir, OTP, Phoenix, or network security.
+  Operating system for AI coding agents (Cursor, Claude Code, Antigravity, Zed, Copilot).
+  Adaptive execution (Ponytail 7-Rung Ladder, YAGNI, KISS, DRY), single-file Helix memory (.skidora/recover.md),
+  zero-hallucination backend routing, and dual-pass verification. Use when starting or continuing a project,
+  recovering past work, fixing bugs surgically, or building/verifying APIs.
 ---
 
-# Skidora
+# Skidora 🧬
 
-Portable operating skill for **any developer and any coding agent**. Install with `npx skills add`. Same files (`.skidora/`, `AGENTS.md`) work in Cursor, Claude Code, Codex, Antigravity, Zed, Copilot, and similar tools.
+Universal agent operating system for **any developer and any coding agent**.
+Works identically in Cursor, Claude Code, Antigravity, Zed, and Copilot.
 
-Do not guess from model knowledge. Read the repo, Helix memory, and real files/APIs, then act. Copy the traces in [examples.md](examples.md).
+---
 
-Memory is compact markdown in `.skidora/recover.md`. Write this file directly. A CLI is not required.
+## The Core Operating Model
 
-## Adaptive Execution Gate (YAGNI, KISS, DRY, SOLID)
-
-Read [references/when-not.md](references/when-not.md) first.
-
-- **Surgical Mode (Default — 90% of tasks):** Run the **7-Rung Ladder of Laziness** (YAGNI → Codebase helpers → Stdlib → Native platform → Existing packages → One-liner → Minimal diff). Responses capped at **≤3 lines** + code diff. Zero markdown ceremony. Append 1-line silently to `.skidora/recover.md`.
-- **Blueprint Mode (10% — Public APIs, DB Migrations, Cross-Service Boundaries):** Map routes to real router files, produce the 3-line Proof-of-Work Badge, and verify against test suites.
-
-## Immediate start (Blueprint Mode only)
-
-Copy this checklist only when touching public API contracts or major architecture:
+Skidora routes every task into one of two modes:
 
 ```
-Skidora:
-- [ ] Load Helix memory (.skidora/recover.md)
-- [ ] Ask missing P0 questions in the standard block
-- [ ] Recognize topic; if not, run Graphifier
-- [ ] Pull only the modules this request needs
-- [ ] Plan (show, or hide if user said don't plan)
-- [ ] Show architecture before any presentation
-- [ ] Implement precisely using 7-Rung Ladder (KISS, DRY, SOLID)
-- [ ] Double-check claims, APIs, endpoints
-- [ ] Retry until endpoints work and score is 95-plus
-- [ ] Record 1-line milestone to .skidora/recover.md
+User Message
+     │
+     ▼
+[Mode Gate: Is it a Public Route, DB Schema Migration, or /plan?]
+     │
+     ├── No (90% Daily Work) ──► SURGICAL MODE
+     │                           - Run 7-Rung Ladder (YAGNI, KISS, DRY)
+     │                           - Shortest working diff wins
+     │                           - Response capped at ≤3 lines
+     │                           - Silent 1-line append to .skidora/recover.md
+     │
+     └── Yes (10% Structural) ──► BLUEPRINT MODE
+                                 - Load .skidora/recover.md
+                                 - Ask P0 blockers if facts are missing
+                                 - Map NLP to real router files (skidora-backend)
+                                 - Dual-Pass Proof-of-Work (skidora-verify)
+                                 - Output 3-line Proof-of-Work badge
 ```
 
-0. Read [references/when-not.md](references/when-not.md) (or skill `skidora-when-not`). Default to Surgical Mode.
-1. Read [references/helix-memory.md](references/helix-memory.md) (or skill `skidora-helix`). Maintain single-file `.skidora/recover.md`.
-2. If anything required is missing, read [references/intake.md](references/intake.md) and ask using [templates/question-block.md](templates/question-block.md).
-3. If the topic is unclear, torn, or conflicting, read [references/graphifier.md](references/graphifier.md).
-4. Read [references/planning.md](references/planning.md). Always plan for structural tasks.
-5. Read [references/agent-handling.md](references/agent-handling.md) for how to talk to the user (≤3 lines for small tasks).
+---
 
-## AG3 loop
+## The 7-Rung Ladder of Laziness
 
-1. **Intake** — recover context, ask P0 gaps, map user language to real artifacts.
-2. **Plan** — architecture, demanded artifacts, which modules to pull. Visible unless hidden.
-3. **Execute + verify** — implement via 7-Rung Ladder, check twice, loop until green.
+Before writing any new code, step down the ladder and **stop at the first rung that holds**:
 
-```
-User message
-  -> Check Surgical vs Blueprint (7-Rung Ladder)
-  -> Helix load (.skidora/recover.md)
-  -> If Blueprint: intake -> plan -> architecture -> dual-pass verify
-  -> If Surgical: shortest working diff -> ≤3 lines output
-  -> 1-line append to recover.md
-```
+1. **Rung 1 — YAGNI:** Does this need to exist? If speculative, skip it.
+2. **Rung 2 — In Codebase:** Reuse existing helpers, types, or utilities (DRY).
+3. **Rung 3 — Standard Library:** Use built-in language primitives (`Math`, `Array`, `datetime`, `Enum`).
+4. **Rung 4 — Native Platform:** Leverage native HTML5, CSS, or SQL database constraints.
+5. **Rung 5 — Existing Dependency:** Use what is already installed in `package.json` / `Cargo.toml`.
+6. **Rung 6 — One-Liner:** Keep it cleanly in one line if possible (KISS).
+7. **Rung 7 — Minimum Viable Code:** Write the absolute minimum safe code that fixes the root cause.
 
-## Dispatch
+---
 
-Read only the files this turn needs. Pull other installed skills when they apply (`21st-ui-build`, `ui-design`, `nextjs`, `react`, security).
+## Single-File Helix Memory Contract
 
-| Request kind | Skill (`-s`) | Or bundled file |
+Memory lives in **one single compact file**: `.skidora/recover.md` (<40 lines).
+Never create `draft.md`, `plan.md`, or `graph.md`.
+
+- **On Session Start:** Read `.skidora/recover.md` to resume from **Next**.
+- **On Surgical Completion:** Silently append one line:
+  `- [YYYY-MM-DD] Fixed <issue> in <file>. (<tests pass>)`
+- **On Blueprint Completion:** Update active routes and verified state.
+
+---
+
+## Core Dispatch
+
+| Task Kind | Skill Module | Purpose |
 |---|---|---|
-| Adaptive gate: 7-Rungs, YAGNI, KISS, DRY, SOLID | `skidora-when-not` | [references/when-not.md](references/when-not.md) |
-| Recover, rewind, single-file memory | `skidora-helix` | [references/helix-memory.md](references/helix-memory.md) |
-| Missing intent or stack | `skidora-intake` | [references/intake.md](references/intake.md) |
-| Plan / don't-plan / architecture | `skidora-planning` | [references/planning.md](references/planning.md) |
-| Project phases / bars | `skidora-gsd` | [references/gsd.md](references/gsd.md) |
-| UI, layout, components | `skidora-frontend` | [references/frontend.md](references/frontend.md) |
-| APIs, NLP to endpoints | `skidora-backend` | [references/backend.md](references/backend.md) |
-| Network, CORS, timeouts, OpenReplay Spot | `skidora-network` | [references/network.md](references/network.md) |
-| Erlang, Elixir, OTP, Phoenix | `skidora-erlang-elixir` | [references/erlang-elixir.md](references/erlang-elixir.md) |
-| Pipelines, retry until green | `skidora-cd` | [references/cd-pipelines.md](references/cd-pipelines.md) |
-| Unrecognized topic, torn code | `skidora-graphifier` | [references/graphifier.md](references/graphifier.md) |
-| 95-plus, recheck | `skidora-verify` | [references/verify.md](references/verify.md) |
-| Secrets, fake APIs | `skidora-security` | [references/security.md](references/security.md) |
-| Voice and bars | `skidora-agent-handling` | [references/agent-handling.md](references/agent-handling.md) |
+| **Adaptive Gate** | [`skidora-when-not`](../skidora-when-not) | Enforces 7-Rung Ladder, YAGNI, KISS, DRY. |
+| **Session Memory** | [`skidora-helix`](../skidora-helix) | Reads and updates single-file `.skidora/recover.md`. |
+| **Backend & Routing** | [`skidora-backend`](../skidora-backend) | NLP to physical router handlers; torn router resolution. |
+| **Verification & Network** | [`skidora-verify`](../skidora-verify) | Dual-pass AST + runtime proof, network trace parsing, and 3-line badge. |
+| **BEAM/OTP (Optional)** | [`skidora-erlang-elixir`](../skidora-erlang-elixir) | Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
 
-## Hard rules
+---
 
-- No hallucination. If a file, route, or API is not in the repo or a live spec, do not claim it exists.
-- Recheck every requirement and every endpoint twice against real code or runtime. See [references/verify.md](references/verify.md).
-- Follow YAGNI, KISS ("Do it simple"), and DRY ("Do it once").
-- Write Helix memory to `.skidora/recover.md`. A CLI is not required.
-- NLP maps to real endpoints only. See [references/backend.md](references/backend.md). BEAM routers: [references/erlang-elixir.md](references/erlang-elixir.md).
-- Network & Security: [references/network.md](references/network.md) and [references/security.md](references/security.md).
-- Failures retry in a bounded loop. See [references/cd-pipelines.md](references/cd-pipelines.md).
-- Drop [project-kit/AGENTS.md](project-kit/AGENTS.md) into any repo so every agent self-starts.
+## Production Security Rules
 
-## Examples and templates
+1. **Zero Secrets in Memory:** Never write API keys, bearer tokens, or secrets to `.skidora/recover.md` or git.
+2. **Zero Invented Endpoints:** Every route must exist in physical router code.
+3. **Explicit Destructive Approval:** Deletions, drops, or migrations require explicit user confirmation.
+4. **Mandatory Timeouts:** Every network request must enforce an explicit 5s–10s timeout.
+5. **Strict CORS:** Whitelist specific origins; never pair wildcard `*` with `credentials: true`.
+6. **SSRF Protection:** Whitelist and sanitize all outgoing URLs against internal RFC 1918 subnets.
+7. **Sanitized Errors:** Strip stack traces and internal IPs from public error responses.
+8. **Bounded Retries:** Maximum 3 retries in CD loops; then halt and mark `Blocked` in `recover.md`.
 
-- [examples.md](examples.md) — small fix, shown-plan endpoint, hidden-plan recover
+---
+
+## Proof-of-Work Standard
+
+All structural changes must supply the 3-line badge defined in [templates/proof-of-work.md](templates/proof-of-work.md):
+
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): <file>:<line> — Route registered in router with schema validation.
+- Pass B (Runtime): <command> -> exit 0 (e.g. curl -s -o /dev/null -w "%{http_code}" <URL> -> 200 OK)
+- Regression: <X/X tests passing> (0 failures)
+```

@@ -1,0 +1,12 @@
+[package]
+name = "skidora-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Helix-style memory files for Skidora (draft, recover, graph, index)"
+
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+
+[dev-dependencies]
+tempfile = "3"

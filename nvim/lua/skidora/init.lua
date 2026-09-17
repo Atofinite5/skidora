@@ -96,55 +96,26 @@ function M.recover()
   vim.cmd("split " .. vim.fn.fnameescape(path))
 end
 
-function M.graph(opts)
-  local args = { "graph" }
-  local q = opts.args
-  if q and q ~= "" then
-    table.insert(args, "--question")
-    table.insert(args, q)
+function M.append(opts)
+  local milestone = opts.args
+  if not milestone or milestone == "" then
+    milestone = vim.fn.input("Milestone: ")
   end
-  local res = run(args)
-  if res.code ~= 0 then
-    return notify_err(res)
-  end
-  local path = root() .. "/.skidora/graph.md"
-  vim.cmd("split " .. vim.fn.fnameescape(path))
-end
-
-function M.draft(opts)
-  local phase = opts.fargs[1] or "execute"
-  local title = opts.fargs[2] or vim.fn.input("Title: ")
-  if title == "" then
+  if milestone == "" then
     return
   end
-  local intent = vim.fn.input("Intent: ")
-  local did = vim.fn.input("Did: ")
-  local evidence = vim.fn.input("Evidence: ")
-  local res = run({
-    "draft",
-    "--phase",
-    phase,
-    "--title",
-    title,
-    "--intent",
-    intent,
-    "--did",
-    did,
-    "--evidence",
-    evidence,
-  })
+  local res = run({ "append", "--milestone", milestone })
   if res.code ~= 0 then
     return notify_err(res)
   end
-  show(res.stdout, "Skidora draft")
+  vim.notify("Skidora: milestone appended to recover.md")
 end
 
 function M.setup()
   vim.api.nvim_create_user_command("SkidoraInit", M.init, {})
   vim.api.nvim_create_user_command("SkidoraStatus", M.status, {})
   vim.api.nvim_create_user_command("SkidoraRecover", M.recover, {})
-  vim.api.nvim_create_user_command("SkidoraGraph", M.graph, { nargs = "*" })
-  vim.api.nvim_create_user_command("SkidoraDraft", M.draft, { nargs = "*" })
+  vim.api.nvim_create_user_command("SkidoraAppend", M.append, { nargs = "*" })
 
   vim.api.nvim_create_autocmd({ "VimEnter", "DirChanged" }, {
     group = vim.api.nvim_create_augroup("SkidoraBars", { clear = true }),
@@ -152,7 +123,7 @@ function M.setup()
       if vim.g.skidora_autostatus == false then
         return
       end
-      if vim.fn.filereadable(root() .. "/.skidora/draft.md") == 1 then
+      if vim.fn.filereadable(root() .. "/.skidora/recover.md") == 1 then
         M.quiet_status()
       end
     end,

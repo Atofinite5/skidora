@@ -21,10 +21,10 @@ pub struct Bars {
 impl Default for Bars {
     fn default() -> Self {
         Self {
-            phase: "clarify".into(),
+            phase: "execute".into(),
             done: "—".into(),
             blocked: "—".into(),
-            next: "load Helix and intake".into(),
+            next: "continue from recover.md".into(),
         }
     }
 }
@@ -116,24 +116,40 @@ pub fn init_project(root: &Path) -> Result<ProjectPaths> {
     let paths = ProjectPaths::new(root);
     fs::create_dir_all(paths.skidora_dir())?;
     fs::create_dir_all(paths.tools())?;
-    write_if_missing(&paths.draft(), templates::DRAFT)?;
-    write_if_missing(&paths.plan(), templates::PLAN)?;
     let recover = templates::RECOVER
         .replace("{slug}", &paths.slug())
         .replace("{path}", &root.display().to_string())
         .replace("{updated}", &today());
     write_if_missing(&paths.recover(), &recover)?;
-    let graph = templates::GRAPH
-        .replace("{updated}", &today())
-        .replace("{question}", "—");
-    write_if_missing(&paths.graph(), &graph)?;
     Ok(paths)
 }
 
 pub fn parse_bars(text: &str) -> Bars {
     let mut bars = Bars::default();
+    let mut in_goal = false;
+    let mut in_next = false;
     for line in text.lines() {
-        if let Some(v) = line.strip_prefix("Phase:") {
+        let trimmed = line.trim();
+        if trimmed == "## Goal" {
+            in_goal = true;
+            in_next = false;
+            continue;
+        } else if trimmed == "## Next" {
+            in_next = true;
+            in_goal = false;
+            continue;
+        } else if trimmed.starts_with("## ") {
+            in_goal = false;
+            in_next = false;
+        }
+
+        if in_goal && !trimmed.is_empty() && trimmed != "—" {
+            bars.done = trimmed.trim_start_matches('-').trim().to_string();
+            in_goal = false;
+        } else if in_next && !trimmed.is_empty() && trimmed != "—" {
+            bars.next = trimmed.trim_start_matches('-').trim().to_string();
+            in_next = false;
+        } else if let Some(v) = line.strip_prefix("Phase:") {
             bars.phase = v.trim().to_string();
         } else if let Some(v) = line.strip_prefix("Done:") {
             bars.done = v.trim().to_string();
@@ -148,65 +164,37 @@ pub fn parse_bars(text: &str) -> Bars {
 
 pub fn read_bars(root: &Path) -> Result<Bars> {
     let paths = ProjectPaths::new(root);
-    if !paths.draft().exists() {
-        return Err(Error::Missing(paths.draft()));
+    if !paths.recover().exists() {
+        return Err(Error::Missing(paths.recover()));
     }
-    let text = fs::read_to_string(paths.draft())?;
+    let text = fs::read_to_string(paths.recover())?;
     Ok(parse_bars(&text))
 }
 
-fn set_header_line(text: &str, key: &str, value: &str) -> String {
-    let prefix = format!("{key}:");
-    let mut replaced = false;
-    let mut out = String::new();
-    for line in text.lines() {
-        if line.starts_with(&prefix) && !replaced {
-            out.push_str(&format!("{key}: {value}\n"));
-            replaced = true;
-        } else {
-            out.push_str(line);
-            out.push('\n');
-        }
+pub fn append_milestone(root: &Path, milestone: &str) -> Result<()> {
+    let paths = init_project(root)?;
+    let mut text = fs::read_to_string(paths.recover())?;
+    let stamp = today();
+    let line = format!("- [{stamp}] {milestone}\n");
+    if !text.contains("## Verified Milestones") {
+        text.push_str("\n## Verified Milestones\n");
     }
-    if !replaced {
-        format!("{key}: {value}\n{out}")
-    } else {
-        out
-    }
+    text.push_str(&line);
+    fs::write(paths.recover(), text)?;
+    Ok(())
 }
 
 pub fn append_draft(root: &Path, entry: &DraftEntry, bars: Option<&Bars>) -> Result<Bars> {
-    let paths = init_project(root)?;
-    let mut text = fs::read_to_string(paths.draft())?;
-    let mut current = parse_bars(&text);
+    let _paths = init_project(root)?;
+    let summary = format!("{}: {} ({})", entry.phase, entry.title, entry.evidence);
+    append_milestone(root, &summary)?;
+    let mut current = read_bars(root).unwrap_or_default();
     if let Some(b) = bars {
         current = b.clone();
     } else {
         current.phase = entry.phase.clone();
         current.done = entry.title.clone();
     }
-    text = set_header_line(&text, "Phase", &current.phase);
-    text = set_header_line(&text, "Done", &current.done);
-    text = set_header_line(&text, "Blocked", &current.blocked);
-    text = set_header_line(&text, "Next", &current.next);
-    let stamp = entry
-        .timestamp
-        .clone()
-        .unwrap_or_else(now_stamp);
-    let block = format!(
-        "\n## [{stamp}] {phase} — {title}\n- Intent: {intent}\n- Did: {did}\n- Evidence: {evidence}\n- Open: {open}\n",
-        phase = entry.phase,
-        title = entry.title,
-        intent = entry.intent,
-        did = entry.did,
-        evidence = if entry.evidence.is_empty() { "—" } else { &entry.evidence },
-        open = if entry.open.is_empty() { "—" } else { &entry.open },
-    );
-    if !text.ends_with('\n') {
-        text.push('\n');
-    }
-    text.push_str(&block);
-    fs::write(paths.draft(), text)?;
     Ok(current)
 }
 
@@ -222,23 +210,6 @@ pub fn write_recover(root: &Path, prompt: &RecoverPrompt) -> Result<PathBuf> {
     let paths = init_project(root)?;
     fs::write(paths.recover(), prompt.render())?;
     Ok(paths.recover())
-}
-
-pub fn write_graph(root: &Path, question: &str, updated: Option<&str>) -> Result<PathBuf> {
-    let paths = init_project(root)?;
-    let body = templates::GRAPH
-        .replace("{updated}", updated.unwrap_or(&today()))
-        .replace("{question}", question);
-    fs::write(paths.graph(), body)?;
-    Ok(paths.graph())
-}
-
-pub fn read_graph(root: &Path) -> Result<String> {
-    let paths = ProjectPaths::new(root);
-    if !paths.graph().exists() {
-        return Err(Error::Missing(paths.graph()));
-    }
-    Ok(fs::read_to_string(paths.graph())?)
 }
 
 pub fn upsert_index(
@@ -317,52 +288,24 @@ mod tests {
     }
 
     #[test]
-    fn init_is_idempotent_and_creates_files() {
+    fn init_is_idempotent_and_creates_recover_only() {
         let dir = tempdir().unwrap();
         init_project(dir.path()).unwrap();
-        let draft = dir.path().join(".skidora/draft.md");
-        fs::write(&draft, "keep me\nPhase: execute\n").unwrap();
-        init_project(dir.path()).unwrap();
-        let body = fs::read_to_string(&draft).unwrap();
-        assert!(body.contains("keep me"));
         assert!(dir.path().join(".skidora/recover.md").exists());
-        assert!(dir.path().join(".skidora/graph.md").exists());
-        assert!(dir.path().join(".skidora/plan.md").exists());
+        // Verify that draft.md, plan.md, graph.md are NOT created!
+        assert!(!dir.path().join(".skidora/draft.md").exists());
+        assert!(!dir.path().join(".skidora/plan.md").exists());
+        assert!(!dir.path().join(".skidora/graph.md").exists());
         assert!(dir.path().join(".skidora/tools").is_dir());
     }
 
     #[test]
-    fn draft_appends_and_updates_bars() {
+    fn milestone_appends_to_recover() {
         let dir = tempdir().unwrap();
-        let entry1 = DraftEntry {
-            phase: "execute".into(),
-            title: "add cli".into(),
-            intent: "build rust cli".into(),
-            did: "crates/skidora-cli".into(),
-            evidence: "cargo test".into(),
-            open: "nvim".into(),
-            timestamp: Some("2026-09-16 21:00".into()),
-        };
-        append_draft(dir.path(), &entry1, None).unwrap();
-        let bars = read_bars(dir.path()).unwrap();
-        assert_eq!(bars.phase, "execute");
-        assert_eq!(bars.done, "add cli");
-        let entry2 = DraftEntry {
-            phase: "verify".into(),
-            title: "recheck".into(),
-            intent: "prove tests".into(),
-            did: "cargo test".into(),
-            evidence: "ok".into(),
-            open: "—".into(),
-            timestamp: Some("2026-09-16 21:05".into()),
-        };
-        append_draft(dir.path(), &entry2, None).unwrap();
-        let text = fs::read_to_string(dir.path().join(".skidora/draft.md")).unwrap();
-        assert!(text.contains("add cli"));
-        assert!(text.contains("recheck"));
-        assert!(text.contains("## [2026-09-16 21:00] execute — add cli"));
-        let bars = read_bars(dir.path()).unwrap();
-        assert_eq!(bars.phase, "verify");
+        init_project(dir.path()).unwrap();
+        append_milestone(dir.path(), "Fixed 14/14 tests in auth module").unwrap();
+        let text = fs::read_to_string(dir.path().join(".skidora/recover.md")).unwrap();
+        assert!(text.contains("Fixed 14/14 tests in auth module"));
     }
 
     #[test]
@@ -384,44 +327,18 @@ mod tests {
         let text = read_recover(dir.path()).unwrap();
         assert!(text.contains("Slug: demo"));
         assert!(text.contains("ship memory cli"));
-        assert!(text.contains("wire nvim"));
-    }
-
-    #[test]
-    fn graph_writes_question() {
-        let dir = tempdir().unwrap();
-        write_graph(dir.path(), "where is auth?", Some("2026-09-16")).unwrap();
-        let text = read_graph(dir.path()).unwrap();
-        assert!(text.contains("Question: where is auth?"));
-        assert!(text.contains("## Nodes"));
-        assert!(text.contains("## Edges"));
     }
 
     #[test]
     fn index_upsert_replaces_same_slug() {
         let dir = tempdir().unwrap();
         let skill = SkillPaths::new(dir.path());
-        upsert_index(&skill, "skidora", "/tmp/a", "first", "2026-09-16").unwrap();
-        upsert_index(&skill, "skidora", "/tmp/a", "second", "2026-09-17").unwrap();
-        upsert_index(&skill, "other", "/tmp/b", "hi", "2026-09-17").unwrap();
+        upsert_index(&skill, "my-app", "/a", "wip", "2026-09-16").unwrap();
+        upsert_index(&skill, "other", "/b", "done", "2026-09-16").unwrap();
+        upsert_index(&skill, "my-app", "/a", "done", "2026-09-17").unwrap();
         let text = fs::read_to_string(skill.index()).unwrap();
-        assert_eq!(text.matches("| skidora |").count(), 1);
-        assert!(text.contains("| skidora | /tmp/a | second | 2026-09-17 |"));
-        assert!(text.contains("| other |"));
-        let prompt = RecoverPrompt {
-            slug: "skidora".into(),
-            path: "/tmp/a".into(),
-            updated: "2026-09-17".into(),
-            goal: "tiny prompt".into(),
-            decisions: "none".into(),
-            key_files: "none".into(),
-            live_endpoints: "none".into(),
-            nlp_map: "none".into(),
-            next: "done".into(),
-            open_risks: "none".into(),
-        };
-        save_global_recover(&skill, &prompt).unwrap();
-        let copied = fs::read_to_string(skill.project_prompt("skidora")).unwrap();
-        assert!(copied.contains("tiny prompt"));
+        assert_eq!(text.matches("| my-app |").count(), 1);
+        assert!(text.contains("| my-app | /a | done | 2026-09-17 |"));
+        assert!(text.contains("| other | /b | done | 2026-09-16 |"));
     }
 }

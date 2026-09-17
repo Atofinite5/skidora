@@ -3,14 +3,14 @@ use std::process::ExitCode;
 
 use clap::{Parser, Subcommand};
 use skidora_core::{
-    append_draft, init_project, read_bars, read_graph, read_recover, save_global_recover, today,
-    write_graph, write_recover, DraftEntry, ProjectPaths, RecoverPrompt, SkillPaths,
+    append_milestone, init_project, read_bars, read_recover, save_global_recover, today,
+    write_recover, ProjectPaths, RecoverPrompt, SkillPaths,
 };
 
 #[derive(Parser)]
 #[command(
     name = "skidora",
-    about = "Helix-style memory for Skidora projects",
+    about = "Helix single-file memory engine for Skidora projects",
     version
 )]
 struct Cli {
@@ -28,30 +28,24 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Create .skidora/ draft, recover, plan, graph, tools
+    /// Create .skidora/recover.md single ledger
     Init,
-    /// Print Phase / Done / Blocked / Next
+    /// Print Goal / Phase / Next from recover.md
     Status,
-    /// Append one Helix draft entry
+    /// Append one verified milestone line to .skidora/recover.md
+    Append {
+        /// Milestone description and proof
+        #[arg(long)]
+        milestone: String,
+    },
+    /// Backward-compatible alias to append a milestone
     Draft {
         #[arg(long)]
         phase: String,
         #[arg(long)]
         title: String,
-        #[arg(long)]
-        intent: String,
-        #[arg(long)]
-        did: String,
         #[arg(long, default_value = "—")]
         evidence: String,
-        #[arg(long, default_value = "—")]
-        open: String,
-        #[arg(long)]
-        done: Option<String>,
-        #[arg(long)]
-        blocked: Option<String>,
-        #[arg(long)]
-        next: Option<String>,
     },
     /// Print or rewrite the tiny recover prompt
     Recover {
@@ -64,11 +58,6 @@ enum Commands {
         /// Also write memory/projects/<slug>.md and upsert the skill index
         #[arg(long)]
         global: bool,
-    },
-    /// Write or print Graphifier topology
-    Graph {
-        #[arg(long)]
-        question: Option<String>,
     },
 }
 
@@ -92,47 +81,24 @@ fn run() -> skidora_core::Result<()> {
     match cli.command {
         Commands::Init => {
             let paths = init_project(&root)?;
-            println!("{}", paths.skidora_dir().display());
+            println!("{}", paths.recover().display());
         }
         Commands::Status => {
             let bars = read_bars(&root)?;
             println!("{}", bars.render());
         }
+        Commands::Append { milestone } => {
+            append_milestone(&root, &milestone)?;
+            println!("Appended milestone to .skidora/recover.md");
+        }
         Commands::Draft {
             phase,
             title,
-            intent,
-            did,
             evidence,
-            open,
-            done,
-            blocked,
-            next,
         } => {
-            let mut bars = if root.join(".skidora/draft.md").exists() {
-                read_bars(&root).unwrap_or_default()
-            } else {
-                Default::default()
-            };
-            bars.phase = phase.clone();
-            bars.done = done.unwrap_or_else(|| title.clone());
-            if let Some(b) = blocked {
-                bars.blocked = b;
-            }
-            if let Some(n) = next {
-                bars.next = n;
-            }
-            let entry = DraftEntry {
-                phase,
-                title,
-                intent,
-                did,
-                evidence,
-                open,
-                timestamp: None,
-            };
-            let bars = append_draft(&root, &entry, Some(&bars))?;
-            println!("{}", bars.render());
+            let summary = format!("{phase}: {title} ({evidence})");
+            append_milestone(&root, &summary)?;
+            println!("Appended milestone to .skidora/recover.md");
         }
         Commands::Recover {
             goal,
@@ -153,7 +119,7 @@ fn run() -> skidora_core::Result<()> {
                     }),
                     decisions: decisions.unwrap_or_else(|| "none".into()),
                     key_files: value_after(&existing, "## Key files")
-                        .unwrap_or_else(|| ".skidora/draft.md — running Helix log".into()),
+                        .unwrap_or_else(|| "none".into()),
                     live_endpoints: value_after(&existing, "## Live endpoints")
                         .unwrap_or_else(|| "none".into()),
                     nlp_map: value_after(&existing, "## NLP map").unwrap_or_else(|| "none".into()),
@@ -198,14 +164,6 @@ fn run() -> skidora_core::Result<()> {
                 }
             }
             print!("{}", read_recover(&root)?);
-        }
-        Commands::Graph { question } => {
-            if let Some(q) = question {
-                write_graph(&root, &q, None)?;
-            } else {
-                init_project(&root)?;
-            }
-            print!("{}", read_graph(&root)?);
         }
     }
     Ok(())

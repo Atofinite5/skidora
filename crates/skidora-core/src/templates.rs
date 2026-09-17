@@ -1,31 +1,3 @@
-pub const DRAFT: &str = r#"# Draft log
-
-Phase: clarify
-Done: —
-Blocked: —
-Next: load Helix and intake
-
----
-
-## [session start]
-- Intent:
-- Did: created `.skidora/`
-- Evidence: —
-- Open:
-"#;
-
-pub const PLAN: &str = r#"# Plan
-- Intent:
-- Action class:
-- Scope (in):
-- Scope (out):
-- Modules to pull:
-- Architecture:
-- Artifacts:
-- Verify:
-- Risks:
-"#;
-
 pub const RECOVER: &str = r#"# Recover prompt
 
 Slug: {slug}
@@ -39,7 +11,7 @@ Updated: {updated}
 - none yet
 
 ## Key files
-- .skidora/draft.md — running Helix log
+- none
 
 ## Live endpoints
 - none
@@ -52,23 +24,9 @@ load Helix and intake
 
 ## Open risks
 - none
-"#;
 
-pub const GRAPH: &str = r#"# Graph
-Updated: {updated}
-Question: {question}
-
-## Nodes
--
-
-## Edges
--
-
-## Torn
--
-
-## Next
--
+## Verified Milestones
+- [{updated}] Initialized Skidora single-file recover memory.
 "#;
 
 pub const INDEX: &str = r#"# Recover index

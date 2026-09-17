@@ -15,20 +15,8 @@ impl ProjectPaths {
         self.root.join(".skidora")
     }
 
-    pub fn draft(&self) -> PathBuf {
-        self.skidora_dir().join("draft.md")
-    }
-
     pub fn recover(&self) -> PathBuf {
         self.skidora_dir().join("recover.md")
-    }
-
-    pub fn plan(&self) -> PathBuf {
-        self.skidora_dir().join("plan.md")
-    }
-
-    pub fn graph(&self) -> PathBuf {
-        self.skidora_dir().join("graph.md")
     }
 
     pub fn tools(&self) -> PathBuf {

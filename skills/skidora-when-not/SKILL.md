@@ -6,19 +6,19 @@ description: >-
 
 # Adaptive Execution & Core Principles
 
-Prevent ceremony suffocation and bloated code by combining **Ponytail's 7-Rung Ladder** with **YAGNI, KISS, DRY, and SOLID**.
+Prevent ceremony suffocation and AI slop by combining **Ponytail's 7-Rung Ladder** with **YAGNI, KISS, DRY, and SOLID**.
 
 ## Core Engineering Principles
 
-- **YAGNI (You Aren't Gonna Need It):** Never generate speculative code or unrequested markdown files.
+- **YAGNI (You Aren't Gonna Need It):** Never generate speculative code, unrequested classes, or unnecessary markdown files.
 - **KISS ("Do it simple"):** Shortest working diff wins. Stop at the lowest rung that holds.
-- **DRY ("Do it once"):** Reuse existing codebase helpers and stdlib. In memory, keep **only one single `.skidora/recover.md`** ledger.
-- **SOLID Design:**
-  - **S (Single Responsibility):** Each change does one thing well.
-  - **O (Open/Closed):** Extend functionality without modifying stable contracts.
-  - **L (Liskov Substitution):** New components remain drop-in compatible.
-  - **I (Interface Segregation):** No developer forced through paperwork ceremonies for small fixes.
-  - **D (Dependency Inversion):** Depend on clean interfaces/routers, not rigid hardcoded bindings.
+- **DRY ("Do it once"):** Reuse existing codebase helpers and standard libraries. In memory, keep **only one single `.skidora/recover.md`** ledger.
+- **SOLID Architectural Foundations:**
+  - **S (Single Responsibility):** Each module, function, or edit does one thing well with a single reason to change.
+  - **O (Open/Closed):** Open for extension, closed for modification — extend functionality without breaking stable public contracts.
+  - **L (Liskov Substitution):** Subtypes and replacement handlers must remain drop-in compatible with expected interfaces.
+  - **I (Interface Segregation):** Keep interfaces fine-grained; agents and modules must never depend on methods or prompts they do not use.
+  - **D (Dependency Inversion):** Depend on abstractions and route declarations, never on rigid, hardcoded concrete implementations.
 
 ## The 7-Rung Ladder (Default Daily Mode)
 

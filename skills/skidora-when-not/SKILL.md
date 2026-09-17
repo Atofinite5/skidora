@@ -1,37 +1,45 @@
 ---
 name: skidora-when-not
 description: >-
-  Skip vs full AG3 loop. Use for typos, one-line edits, and questions so Skidora stays efficient.
+  Adaptive execution gate: 7-Rung Ladder of Laziness, YAGNI, KISS, DRY, and SOLID principles. Default to surgical diffs (≤3 lines explanation, zero ceremony); reserve blueprint dumps strictly for public route or schema changes.
 ---
 
-# When not to run the full loop
+# Adaptive Execution & Core Principles
 
-Skidora stays efficient by **not** running AG3 on small work. This applies to every agent and every project.
+Prevent ceremony suffocation and bloated code by combining **Ponytail's 7-Rung Ladder** with **YAGNI, KISS, DRY, and SOLID**.
 
-## Small (skip plan, architecture, Graphifier, 95-plus loop)
+## Core Engineering Principles
 
-Do these in one pass. Still no hallucination. Still do not invent files.
+- **YAGNI (You Aren't Gonna Need It):** Never generate speculative code or unrequested markdown files.
+- **KISS ("Do it simple"):** Shortest working diff wins. Stop at the lowest rung that holds.
+- **DRY ("Do it once"):** Reuse existing codebase helpers and stdlib. In memory, keep **only one single `.skidora/recover.md`** ledger.
+- **SOLID Design:**
+  - **S (Single Responsibility):** Each change does one thing well.
+  - **O (Open/Closed):** Extend functionality without modifying stable contracts.
+  - **L (Liskov Substitution):** New components remain drop-in compatible.
+  - **I (Interface Segregation):** No developer forced through paperwork ceremonies for small fixes.
+  - **D (Dependency Inversion):** Depend on clean interfaces/routers, not rigid hardcoded bindings.
 
-- Typo, comment, rename of one symbol, one-line fix
-- "What does this file do?" / "Where is X?" (answer from the repo)
-- Format, lint-ignore, import sort
-- Re-word a reply with no code change
+## The 7-Rung Ladder (Default Daily Mode)
 
-For small work: Helix load if `.skidora/` exists (do not init), change the file, one proof if tests are already in reach. No question block. No architecture dump.
+Before writing any new code, step down the ladder and **stop at the first rung that holds**:
 
-## Full loop (required)
+1. **YAGNI:** Does this need to exist? Skip if speculative.
+2. **In Codebase:** Reuse existing helpers, types, or utilities (DRY).
+3. **Standard Library:** Use language built-ins instead of custom packages.
+4. **Native Platform:** Leverage HTML5, CSS, or database constraints.
+5. **Existing Dependency:** Use already-installed libraries.
+6. **One-Liner:** Keep it cleanly in one line if possible (KISS).
+7. **Minimum Viable Code:** Write the absolute minimum safe code that fixes the root cause.
 
-- New feature, new/removed endpoint or component
-- Workflow, automation, CD, scaffold
-- Recover/rewind a past project
-- Torn code, unclear topic
-- User said accept / remove this / make this backend or frontend
-- Any presentation, demo, or "it works" claim on an API or UI
+## Operating Modes
 
-## Hidden plan is not "small"
-
-`don't plan` still writes `.skidora/plan.md` and still verifies. It only hides the plan from the user. See [planning.md](planning.md).
-
-## One module per turn
-
-After the skip/full decision, read **at most** the dispatch rows you need. Do not open every reference file.
+- **Surgical Mode (Default — 90% of tasks):**
+  - Use 7-Rung Ladder.
+  - Response capped at **3 lines or fewer** + code diff.
+  - Zero markdown files dumped.
+  - Silently record a 1-line summary into `.skidora/recover.md`.
+- **Blueprint Mode (10% of tasks — Public APIs, Migrations, Boundaries):**
+  - Map endpoints to router files (no hallucinated routes).
+  - Run dual-pass verification (static AST + runtime proof).
+  - Produce the 3-line Proof-of-Work Badge.

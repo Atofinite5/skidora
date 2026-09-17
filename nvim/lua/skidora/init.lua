@@ -1,25 +1,50 @@
 local M = {}
 
-local function bin()
-  return vim.g.skidora_bin or "skidora"
-end
-
 local function root()
   return vim.fn.getcwd()
 end
 
+local function bin()
+  if vim.g.skidora_bin and vim.fn.executable(vim.g.skidora_bin) == 1 then
+    return vim.g.skidora_bin
+  end
+  if vim.fn.executable("skidora") == 1 then
+    return "skidora"
+  end
+  local candidates = {
+    root() .. "/target/release/skidora",
+    root() .. "/target/debug/skidora",
+  }
+  for _, path in ipairs(candidates) do
+    if vim.fn.executable(path) == 1 then
+      return path
+    end
+  end
+  return nil
+end
+
 local function run(args)
-  local cmd = { bin(), "--path", root() }
+  local executable = bin()
+  if not executable then
+    return {
+      code = 1,
+      stdout = "",
+      stderr = "Skidora binary not found. Please install via 'cargo install --path crates/skidora-cli' or set vim.g.skidora_bin",
+    }
+  end
+
+  local cmd = { executable, "--path", root() }
   vim.list_extend(cmd, args)
-  local result
+
   if vim.system then
-    result = vim.system(cmd, { text = true }):wait()
+    local result = vim.system(cmd, { text = true }):wait()
     return {
       code = result.code or 1,
       stdout = result.stdout or "",
       stderr = result.stderr or "",
     }
   end
+
   local out = vim.fn.system(cmd)
   return {
     code = vim.v.shell_error,
@@ -35,12 +60,19 @@ local function show(text, title)
   end
   local buf = vim.api.nvim_create_buf(false, true)
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+
   vim.bo[buf].filetype = "markdown"
   vim.bo[buf].modifiable = false
   vim.bo[buf].bufhidden = "wipe"
-  local width = math.min(80, vim.o.columns - 4)
+
+  -- Allow closing the popup quickly with 'q' or '<Esc>'
+  vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = buf, silent = true, nowait = true })
+  vim.keymap.set("n", "<Esc>", "<cmd>close<cr>", { buffer = buf, silent = true, nowait = true })
+
+  local width = math.min(80, math.max(vim.o.columns - 4, 20))
   local height = math.min(math.max(#lines, 4), math.floor(vim.o.lines * 0.4))
-  vim.api.nvim_open_win(buf, true, {
+
+  local win_opts = {
     relative = "editor",
     width = width,
     height = height,
@@ -48,16 +80,25 @@ local function show(text, title)
     col = math.floor((vim.o.columns - width) / 2),
     style = "minimal",
     border = "rounded",
-    title = title or "Skidora",
-  })
+  }
+
+  if vim.fn.has("nvim-0.8") == 1 then
+    win_opts.title = title or "Skidora"
+    win_opts.title_pos = "center"
+  end
+
+  vim.api.nvim_open_win(buf, true, win_opts)
 end
 
 local function notify_err(res)
   local msg = res.stderr
-  if msg == "" then
+  if not msg or msg == "" then
     msg = res.stdout
   end
-  vim.notify(msg, vim.log.levels.ERROR)
+  if not msg or msg == "" then
+    msg = "Unknown error occurred"
+  end
+  vim.notify(vim.trim(msg), vim.log.levels.ERROR)
 end
 
 function M.init()
@@ -65,7 +106,7 @@ function M.init()
   if res.code ~= 0 then
     return notify_err(res)
   end
-  vim.notify("Skidora init: " .. vim.trim(res.stdout))
+  vim.notify("Skidora init: " .. vim.trim(res.stdout), vim.log.levels.INFO)
 end
 
 function M.status()
@@ -73,7 +114,7 @@ function M.status()
   if res.code ~= 0 then
     return notify_err(res)
   end
-  show(res.stdout, "Skidora status")
+  show(res.stdout, "Skidora Status")
 end
 
 function M.quiet_status()
@@ -101,14 +142,14 @@ function M.append(opts)
   if not milestone or milestone == "" then
     milestone = vim.fn.input("Milestone: ")
   end
-  if milestone == "" then
+  if not milestone or milestone == "" then
     return
   end
   local res = run({ "append", "--milestone", milestone })
   if res.code ~= 0 then
     return notify_err(res)
   end
-  vim.notify("Skidora: milestone appended to recover.md")
+  vim.notify("Skidora: milestone appended to recover.md", vim.log.levels.INFO)
 end
 
 function M.setup()

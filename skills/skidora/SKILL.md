@@ -4,11 +4,12 @@ description: >-
   Portable agent skill for any coding agent and any project (Cursor, Claude
   Code, Codex, Copilot, Neovim, others). Helix recover memory, skip-small-tasks
   gate, always-plan (hidden if asked), GSD/frontend/backend/NLP/CD, Graphifier,
-  OTP/Phoenix, tool generation, double-check until endpoints pass. Use when
-  starting or continuing a project, recovering past work, building frontend or
-  backend, mapping NLP to endpoints, automations, CD, architecture before
-  presentation, or when the user mentions Skidora, Helix memory, Graphifier,
-  GSD, Neovim, Erlang, Elixir, OTP, or Phoenix.
+  OTP/Phoenix, tool generation, double-check until endpoints pass, network &
+  production security. Use when starting or continuing a project, recovering
+  past work, building frontend or backend, mapping NLP to endpoints,
+  automations, CD, architecture before presentation, network/API inspection,
+  or when the user mentions Skidora, Helix memory, Graphifier, GSD, Neovim,
+  Erlang, Elixir, OTP, Phoenix, or network security.
 ---
 
 # Skidora
@@ -83,6 +84,7 @@ Read only the files this turn needs. Pull other installed skills when they apply
 | Project phases / bars | `skidora-gsd` | [references/gsd.md](references/gsd.md) |
 | UI, layout, components | `skidora-frontend` | [references/frontend.md](references/frontend.md) |
 | APIs, NLP to endpoints | `skidora-backend` | [references/backend.md](references/backend.md) |
+| Network, CORS, timeouts, Jam alt | `skidora-network` | [references/network.md](references/network.md) |
 | Erlang, Elixir, OTP, Phoenix | `skidora-erlang-elixir` | [references/erlang-elixir.md](references/erlang-elixir.md) |
 | Pipelines, retry until green | `skidora-cd` | [references/cd-pipelines.md](references/cd-pipelines.md) |
 | Unrecognized topic, torn code | `skidora-graphifier` | [references/graphifier.md](references/graphifier.md) |
@@ -109,7 +111,7 @@ Keep these four lines current in `.skidora/draft.md` and in user-facing status:
 - Do not invent Cursor/MCP built-in tools. If the project needs a helper, create it under `.skidora/tools/` (project) or `scripts/` (reusable). See [references/gsd.md](references/gsd.md).
 - Write Helix files with normal file tools: `.skidora/recover.md`, `draft.md`, `plan.md`, `graph.md`. A CLI is not required.
 - NLP maps to real endpoints only. See [references/backend.md](references/backend.md). BEAM routers: [references/erlang-elixir.md](references/erlang-elixir.md).
-- Security: [references/security.md](references/security.md).
+- Network & Security: [references/network.md](references/network.md) and [references/security.md](references/security.md).
 - Failures retry in a bounded loop. See [references/cd-pipelines.md](references/cd-pipelines.md).
 - Skip the full loop on small work. See [references/when-not.md](references/when-not.md).
 - Drop [project-kit/AGENTS.md](project-kit/AGENTS.md) into any repo so every agent self-starts.

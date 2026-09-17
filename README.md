@@ -12,7 +12,7 @@
 [![Tests](https://img.shields.io/badge/tests-passing-10B981.svg?style=flat-square)](#verification)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [AG3 Loop](#the-ag3-execution-loop) • [Skills Matrix](#skills-matrix) • [Helix Memory](#helix-memory-contract) • [Neovim & Rust](#neovim--rust-engine)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [AG3 Loop](#the-ag3-execution-loop) • [Skills Matrix](#skills-matrix) • [Network & Jam Alt](#network--production-security-jamdev-alternatives) • [Helix Memory](#helix-memory-contract) • [Neovim & Rust](#neovim--rust-engine)
 
 </div>
 
@@ -27,6 +27,7 @@ AI coding assistants are brilliant at writing syntax, but catastrophic at mainta
 | **Context Amnesia** | Agent resets every chat turn; forgets architecture and previously made decisions. | **Helix Memory Engine:** Auto-loads `.skidora/recover.md` at session start and commits running progress to `.skidora/draft.md`. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A checks code AST/routes; Pass B requires real shell/curl execution proof. No proof = not done. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Network & Security Auditing:** Enforces timeout resilience, origin whitelisting, no credentials in URLs, and open-source Jam bug repros. |
 | **Silent Regression** | Fixes one function while breaking three others without running existing test suites. | **Bounded Retry CD Loop:** Runs test gates repeatedly; mandates a **95+ quality score** before reporting complete. |
 | **Context Bloat & Lag** | 5,000-line skill prompts cause slow agent responses and severe attention dilution. | **When-Not Gate:** Skips overhead on trivial one-liners; loads strictly one specialized module per turn. |
 
@@ -44,7 +45,7 @@ npx skills add Atofinite5/skidora --skill '*' -g -y
 
 ```bash
 npx skills add Atofinite5/skidora \
-  -s skidora,skidora-helix,skidora-frontend,skidora-backend,skidora-verify \
+  -s skidora,skidora-helix,skidora-frontend,skidora-backend,skidora-network,skidora-verify \
   -g \
   -a cursor -a claude-code -a antigravity -a zed -a github-copilot \
   -y
@@ -85,10 +86,10 @@ flowchart TD
   planGate -->|Yes| hiddenPlan["3. Write internal plan to .skidora/plan.md (Do not display)"]
   planGate -->|No| showPlan["3. Present Plan + Architecture Blueprint + Demanded Artifacts"]
   
-  hiddenPlan --> execute["4. Precise Implementation (Real APIs only)"]
+  hiddenPlan --> execute["4. Precise Implementation (Real APIs & Networks only)"]
   showPlan --> execute
   
-  execute --> verifyPass{"5. Double-Check: Pass A (AST) + Pass B (Runtime curl/test)"}
+  execute --> verifyPass{"5. Double-Check: Pass A (AST) + Pass B (Runtime curl/network test)"}
   verifyPass -->|Failed / Score < 95| retryLoop["Bounded Retry Loop (Auto-remediate)"]
   retryLoop --> execute
   verifyPass -->|Passed 95+| helixSave["6. Helix Save: Append draft.md & update recover.md"]
@@ -96,7 +97,7 @@ flowchart TD
 
 ---
 
-## 🧩 Skills Matrix (14 Specialized Modules)
+## 🧩 Skills Matrix (15 Specialized Modules)
 
 Skidora is modular. Use the orchestrator for full automation, or install individual modules via `-s <name>`:
 
@@ -110,12 +111,31 @@ Skidora is modular. Use the orchestrator for full automation, or install individ
 | **`skidora-gsd`** | [`skills/skidora-gsd`](./skills/skidora-gsd) | **Execution Bars:** Live project status (`Phase`, `Done`, `Blocked`, `Next`) and on-demand tools. |
 | **`skidora-frontend`** | [`skills/skidora-frontend`](./skills/skidora-frontend) | **UI Standards:** Design tokens, layout hierarchy, and component composition rules. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; strictly no invented endpoints. |
+| **`skidora-network`** | [`skills/skidora-network`](./skills/skidora-network) | **Network & Security:** CORS, timeouts, open-source Jam alternatives (OpenReplay Spot, Highlight.io), and leak prevention. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP:** Phoenix, LiveView, Mix/Rebar3 concurrency, and supervisor patterns. |
 | **`skidora-cd`** | [`skills/skidora-cd`](./skills/skidora-cd) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
 | **`skidora-graphifier`** | [`skills/skidora-graphifier`](./skills/skidora-graphifier) | **Topic Topology:** Reconstructs node and edge graphs when code is torn or context is ambiguous. |
 | **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification targeting a 95+ score on repository test suites. |
 | **`skidora-security`** | [`skills/skidora-security`](./skills/skidora-security) | **Safety First:** Zero credentials in memory files; explicit user authorization for destructive ops. |
 | **`skidora-agent-handling`** | [`skills/skidora-agent-handling`](./skills/skidora-agent-handling) | **Agent Persona:** Factual, concise, and professional tone with zero AI fluff or apologetic chatter. |
+
+---
+
+## 🌐 Network & Production Security (Jam.dev Alternatives)
+
+When debugging network failures, console errors, or bug reports:
+
+### Open-Source Jam Alternatives
+* **OpenReplay Spot** (`openreplay/openreplay`): Direct open-source browser extension alternative to Jam.dev. Bundles console logs, network payloads, and user actions with 100% self-hosted privacy.
+* **Highlight.io** (`highlight/highlight`): Full-stack open-source session replay and network payload inspection.
+* **Crikket** (`redpangilinan/crikket`): Self-hostable bug-reporting tool with automated console & network capture.
+* **mitmproxy** (`mitmproxy/mitmproxy`): Interactive HTTPS network inspection for CLI and backend API debugging.
+
+### Production Network Defense
+1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
+2. **Strict CORS Policy:** Whitelist specific origins. Never combine wildcard `*` with `credentials: true`.
+3. **Mandatory Timeouts:** Every network request must have an explicit timeout (5s–10s) and exponential backoff retry.
+4. **SSRF Defense:** Sanitize and whitelist all user-provided URLs against internal RFC 1918 subnets (`127.0.0.1`, `10.0.0.0/8`, `169.254.169.254`).
 
 ---
 

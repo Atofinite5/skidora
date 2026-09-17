@@ -1,72 +1,202 @@
-# Skidora
+<div align="center">
 
-Agent skills for any project developer. Same format as [skills.sh](https://skills.sh): each folder under `skills/` has a `SKILL.md`. No CLI required. Helix memory is `.skidora/*.md`.
+<img src="./assets/banner.png" alt="Skidora — Zero-Slop Operating System for AI Coding Agents" width="100%" />
 
-## Install (like wshobson)
+# Skidora 🧬
 
-From GitHub (Universal):
+**The Zero-Slop Operating System & Memory Engine for AI Coding Agents.**  
+*Eliminate agent hallucination, context amnesia, and fake API completions across any IDE and model.*
 
-```bash
-npx skills add Atofinite5/skidora \
-  -s skidora,skidora-helix,skidora-when-not,skidora-intake,skidora-planning,skidora-gsd,skidora-frontend,skidora-backend,skidora-erlang-elixir,skidora-cd,skidora-graphifier,skidora-verify,skidora-security,skidora-agent-handling \
-  -g \
-  -a cursor -a claude-code -a antigravity -a zed -a github-copilot -a codex \
-  -y
-```
+[![skills.sh compatible](https://img.shields.io/badge/skills.sh-compatible-00d2ff.svg?style=flat-square)](https://skills.sh)
+[![Agents Supported](https://img.shields.io/badge/agents-Cursor%20%7C%20Claude%20%7C%20Antigravity%20%7C%20Zed%20%7C%20Copilot-7928CA.svg?style=flat-square)](#supported-agents)
+[![Tests](https://img.shields.io/badge/tests-passing-10B981.svg?style=flat-square)](#verification)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-Install everything in the pack at once:
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [AG3 Loop](#the-ag3-execution-loop) • [Skills Matrix](#skills-matrix) • [Helix Memory](#helix-memory-contract) • [Neovim & Rust](#neovim--rust-engine)
+
+</div>
+
+---
+
+## ⚡ The Crisis We Solve
+
+AI coding assistants are brilliant at writing syntax, but catastrophic at maintaining real-world engineering discipline:
+
+| The Agent Slop Problem | What Actually Happens | How Skidora Fixes It |
+|---|---|---|
+| **Context Amnesia** | Agent resets every chat turn; forgets architecture and previously made decisions. | **Helix Memory Engine:** Auto-loads `.skidora/recover.md` at session start and commits running progress to `.skidora/draft.md`. |
+| **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A checks code AST/routes; Pass B requires real shell/curl execution proof. No proof = not done. |
+| **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
+| **Silent Regression** | Fixes one function while breaking three others without running existing test suites. | **Bounded Retry CD Loop:** Runs test gates repeatedly; mandates a **95+ quality score** before reporting complete. |
+| **Context Bloat & Lag** | 5,000-line skill prompts cause slow agent responses and severe attention dilution. | **When-Not Gate:** Skips overhead on trivial one-liners; loads strictly one specialized module per turn. |
+
+---
+
+## 🚀 Quickstart
+
+Install the complete Skidora pack into all your coding agents globally with one command:
 
 ```bash
 npx skills add Atofinite5/skidora --skill '*' -g -y
 ```
 
-From this folder (local):
+### Pick Specific Modules
 
 ```bash
-npx skills add /Users/bhargavkalambhe/Desktop/skidora \
-  -s skidora,skidora-helix,skidora-when-not,skidora-intake,skidora-planning,skidora-gsd,skidora-frontend,skidora-backend,skidora-erlang-elixir,skidora-cd,skidora-graphifier,skidora-verify,skidora-security,skidora-agent-handling \
+npx skills add Atofinite5/skidora \
+  -s skidora,skidora-helix,skidora-frontend,skidora-backend,skidora-verify \
   -g \
-  -a cursor -a claude-code -a antigravity -a zed -a github-copilot -a codex \
+  -a cursor -a claude-code -a antigravity -a zed -a github-copilot \
   -y
 ```
 
-List what this pack contains:
+### Inspect the Pack
 
 ```bash
 npx skills add Atofinite5/skidora --list
 ```
 
-`-g` = all your projects (global). Omit `-g` to install into the current repo only. `-a` picks agents (`cursor`, `claude-code`, `antigravity`, `zed`, `github-copilot`, `codex`, `windsurf`, …). `-s` picks skills. `-y` skips prompts.
+> **Flags:**  
+> • `-g` Installs globally across all your projects.  
+> • `-a` Explicitly selects agents (`cursor`, `claude-code`, `antigravity`, `zed`, `github-copilot`, `codex`, `windsurf`).  
+> • `-s` Selects individual modular skills.  
+> • `-y` Auto-confirms prompts.
 
-## Skills (`-s`)
+---
 
-| `-s` | When |
-|---|---|
-| `skidora` | Full orchestrator (includes references + templates) |
-| `skidora-helix` | Recover / rewind / draft log |
-| `skidora-when-not` | Skip small tasks |
-| `skidora-intake` | P0/P1/P2 questions |
-| `skidora-planning` | Shown or hidden plan |
-| `skidora-gsd` | Phases and bars |
-| `skidora-frontend` | UI / LiveView |
-| `skidora-backend` | APIs / NLP → endpoints |
-| `skidora-erlang-elixir` | OTP / Phoenix / Mix / rebar |
-| `skidora-cd` | Retry until green |
-| `skidora-graphifier` | Nodes, edges, torn code |
-| `skidora-verify` | Double-check, 95-plus |
-| `skidora-security` | Secrets, no fake APIs |
-| `skidora-agent-handling` | Voice and bars |
+## 🔄 The AG3 Execution Loop
 
-## Recover index
+Every agent equipped with Skidora adheres to the **AG3 (Analyze, Gate, Generate, Guarantee)** operating pipeline:
+
+```mermaid
+flowchart TD
+  user["User Command"] --> isSmall{"Small Task? (Typo / One-Liner)"}
+  
+  isSmall -->|Yes| fastTrack["Fast Track: Single-pass proof, no ceremony"]
+  isSmall -->|No (Full Work)| helixLoad["1. Helix Load (.skidora/recover.md)"]
+  
+  helixLoad --> intake["2. Intake: Ask missing P0/P1 questions in standard block"]
+  intake --> recognized{"Topic recognized & code intact?"}
+  
+  recognized -->|No or Code Torn| graphifier["Graphifier: Build node/edge topology cache"]
+  graphifier --> planGate
+  recognized -->|Yes| planGate{"User said 'Don't Plan'?"}
+  
+  planGate -->|Yes| hiddenPlan["3. Write internal plan to .skidora/plan.md (Do not display)"]
+  planGate -->|No| showPlan["3. Present Plan + Architecture Blueprint + Demanded Artifacts"]
+  
+  hiddenPlan --> execute["4. Precise Implementation (Real APIs only)"]
+  showPlan --> execute
+  
+  execute --> verifyPass{"5. Double-Check: Pass A (AST) + Pass B (Runtime curl/test)"}
+  verifyPass -->|Failed / Score < 95| retryLoop["Bounded Retry Loop (Auto-remediate)"]
+  retryLoop --> execute
+  verifyPass -->|Passed 95+| helixSave["6. Helix Save: Append draft.md & update recover.md"]
+```
+
+---
+
+## 🧩 Skills Matrix (14 Specialized Modules)
+
+Skidora is modular. Use the orchestrator for full automation, or install individual modules via `-s <name>`:
+
+| Skill | Module Directory | Core Capability |
+|---|---|---|
+| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Orchestrator:** AG3 master loop, architecture gates, and multi-skill dispatch. |
+| **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Memory & Rewind:** Read/write `.skidora/recover.md` and chronological `.skidora/draft.md`. |
+| **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Zero Overhead:** Skips ceremony for typos and simple lookups to keep execution fast. |
+| **`skidora-intake`** | [`skills/skidora-intake`](./skills/skidora-intake) | **Structured Discovery:** Standardized P0 (blockers), P1 (quality), P2 (optional) question block. |
+| **`skidora-planning`** | [`skills/skidora-planning`](./skills/skidora-planning) | **Architecture First:** Layout & data-flow before demo; internal hidden plan if requested. |
+| **`skidora-gsd`** | [`skills/skidora-gsd`](./skills/skidora-gsd) | **Execution Bars:** Live project status (`Phase`, `Done`, `Blocked`, `Next`) and on-demand tools. |
+| **`skidora-frontend`** | [`skills/skidora-frontend`](./skills/skidora-frontend) | **UI Standards:** Design tokens, layout hierarchy, and component composition rules. |
+| **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; strictly no invented endpoints. |
+| **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP:** Phoenix, LiveView, Mix/Rebar3 concurrency, and supervisor patterns. |
+| **`skidora-cd`** | [`skills/skidora-cd`](./skills/skidora-cd) | **Continuous Delivery:** Automated retry loops that persist until tests turn green. |
+| **`skidora-graphifier`** | [`skills/skidora-graphifier`](./skills/skidora-graphifier) | **Topic Topology:** Reconstructs node and edge graphs when code is torn or context is ambiguous. |
+| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification targeting a 95+ score on repository test suites. |
+| **`skidora-security`** | [`skills/skidora-security`](./skills/skidora-security) | **Safety First:** Zero credentials in memory files; explicit user authorization for destructive ops. |
+| **`skidora-agent-handling`** | [`skills/skidora-agent-handling`](./skills/skidora-agent-handling) | **Agent Persona:** Factual, concise, and professional tone with zero AI fluff or apologetic chatter. |
+
+---
+
+## 💾 Helix Memory Contract
+
+Skidora eliminates context loss by maintaining persistent state directly within your project workspace inside `.skidora/`:
 
 ```
-skidora | /Users/bhargavkalambhe/Desktop/skidora | Skill + Rust CLI + Neovim + OTP/Elixir module | 2026-09-16 |
+your-project/
+├── .skidora/
+│   ├── recover.md       # Tiny compressed prompt restoring full project state instantly
+│   ├── draft.md         # Chronological Helix work log with evidence and phase bars
+│   ├── plan.md          # Active technical specifications and architecture blueprint
+│   └── graph.md         # Node/edge dependency topology of recent modifications
 ```
 
-## Layout
-
+### The 4 Project Status Bars
+Every Skidora execution updates and preserves these live status bars:
+```markdown
+- Phase: intake | plan | execute | verify | ship
+- Done: <concrete items delivered with proof>
+- Blocked: <unanswered P0 questions or external blockers>
+- Next: <immediate next technical action>
 ```
-skills/<name>/SKILL.md
+
+---
+
+## 🦀 Neovim & Rust Engine (Optional)
+
+Skidora's memory contract uses standard Markdown so any AI agent can read and write it natively with zero binary dependencies.
+
+For terminal power users who want editor-native memory manipulation, Skidora includes a high-performance **Rust CLI** and **Neovim Lua plugin**:
+
+```bash
+# Build the native CLI
+cargo build --release
+
+# Run CLI commands directly
+./target/release/skidora status
+./target/release/skidora draft --phase execute --title "Add Stripe webhook"
+./target/release/skidora recover --global
 ```
 
-That is what `npx skills add` discovers.
+In Neovim:
+```vim
+:SkidoraStatus    " View project bars in a floating window
+:SkidoraDraft     " Append log entry with execution proof
+:SkidoraRecover   " Inspect the compressed recovery prompt
+:SkidoraGraph     " View topological node map
+```
+
+---
+
+## 🛡️ The Zero-Slop Guarantee
+
+Before your agent claims an API or feature is "finished", Skidora forces it to provide this standardized **Proof-of-Work Badge**:
+
+```markdown
+[Skidora Proof-of-Work]
+- Route: POST /api/v1/billing/webhook (verified in app/api/billing/route.ts:42)
+- Pass A (Static): Route registered in router with Zod schema validation.
+- Pass B (Runtime): curl -X POST http://localhost:3000/api/v1/billing/webhook -> 200 OK
+- Regression: 14/14 tests green (0 failures)
+```
+
+No more broken builds. No more fake mocks. No more surprises in production.
+
+---
+
+## 🤝 Contributing & Community
+
+Skidora is open-source under the [MIT License](LICENSE). Contributions, bug reports, and new language/framework modules are welcome!
+
+1. Fork the repo: [`Atofinite5/skidora`](https://github.com/Atofinite5/skidora)
+2. Create your feature branch: `git checkout -b feature/awesome-skill`
+3. Commit your changes: `git commit -m "feat: add awesome skill"`
+4. Push to the branch: `git push origin feature/awesome-skill`
+5. Open a Pull Request against `develop`.
+
+---
+
+<div align="center">
+Made with ⚡ by <a href="https://github.com/Atofinite5">Atofinite5</a> for developers who demand real results from AI.
+</div>

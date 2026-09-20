@@ -1,7 +1,7 @@
 ---
 name: skidora-when-not
 description: >-
-  Adaptive execution gate: 7-Rung Ladder of Laziness, YAGNI, KISS, DRY, and SOLID principles. Default to surgical diffs (≤3 lines explanation, zero ceremony); reserve blueprint dumps strictly for public route or schema changes.
+  Adaptive execution gate: 7-Rung Ladder of Laziness, YAGNI, KISS, and DRY. Default to surgical diffs (≤3 lines explanation, zero ceremony); reserve blueprint dumps strictly for public route or schema changes.
 ---
 
 # Adaptive Execution & Core Principles

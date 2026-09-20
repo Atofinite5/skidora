@@ -2,40 +2,41 @@
 
 Slug: skidora
 Path: /Users/bhargavkalambhe/Desktop/skidora
-Updated: 2026-09-16
+Updated: 2026-09-20
 
 ## Goal
-Skill + Rust CLI + Neovim + OTP/Elixir module. Users and agents use the `skidora` CLI for Helix memory.
+Adaptive OS for AI coding agents: Ponytail 7-Rung Ladder, strict single-file memory (.skidora/recover.md), zero-slop dual-pass proof of work.
 
 ## Decisions
-- Keep SKILL.md as the orchestrator; Rust owns file I/O
-- Users use the CLI (`skidora init|status|draft|recover|graph`) and Neovim commands that call it
-- Same `.skidora/` contract for agent and editor
-- Erlang/Elixir is an OTP module for BEAM repos, not a second CLI
-- Install the skill pack to Cursor, Claude, Codex, and Agents; boot repos with AGENTS.md
+- Master orchestrator with two clean modes: Surgical (90%) and Blueprint (10%)
+- Single ledger: .skidora/recover.md (<40 lines); no draft.md, plan.md, or graph.md
+- Dual-pass proof of work: Pass A AST file:line + Pass B runtime command exit 0
+- High-performance Rust engine + Neovim integration with smart binary fallbacks
+- 6 clean skills installed across all agents with native Cursor linking
 
 ## Key files
-- SKILL.md — orchestrator and dispatch
-- crates/skidora-core — draft, recover, graph, index
-- crates/skidora-cli — `skidora` binary
-- nvim/lua/skidora/init.lua — :Skidora* commands
-- references/neovim-rust.md — agent module
-- references/erlang-elixir.md — OTP / Phoenix / Mix / rebar
-- references/when-not.md — skip vs full loop
-- examples.md — three traces
-- project-kit/AGENTS.md — drop into any repo
+- skills/skidora/SKILL.md — Master orchestrator
+- skills/skidora-when-not/SKILL.md — 7-Rung Ladder, YAGNI, KISS, DRY
+- skills/skidora-helix/SKILL.md — Single-file recover.md contract
+- skills/skidora-verify/SKILL.md — Dual-pass verification & Proof-of-Work badge
+- skills/skidora-backend/SKILL.md — NLP to physical router mapping
+- skills/skidora-erlang-elixir/SKILL.md — Optional BEAM/OTP module
+- crates/skidora-core — Memory engine
+- crates/skidora-cli — CLI binary
+- nvim/lua/skidora/init.lua — Neovim commands
 
 ## Live endpoints
 - none (skill + CLI, not an HTTP app)
 
 ## NLP map
-- "recover / rewind" -> skidora recover
-- "don't plan" -> hidden plan then implement
-- "graph / torn" -> skidora graph / Graphifier
-- "phoenix / elixir / erlang / otp" -> erlang-elixir module
+- "recover / state" -> skidora recover
+- "surgical / fix / typo" -> skidora-when-not
+- "route / api / endpoint" -> skidora-backend
+- "verify / test / trace" -> skidora-verify
+- "phoenix / elixir / erlang / otp" -> skidora-erlang-elixir
 
 ## Next
-User uses the CLI (`skidora status`, `skidora recover --global`) and Neovim `:Skidora*` on top of it.
+Maintain production-grade agent execution with verified proof-of-work.
 
 ## Open risks
 - none

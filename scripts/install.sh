@@ -3,7 +3,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SKILLS="${SKILLS:-skidora,skidora-when-not,skidora-helix,skidora-verify,skidora-backend}"
+SKILLS="${SKILLS:-skidora,skidora-when-not,skidora-helix,skidora-verify,skidora-backend,skidora-erlang-elixir}"
 AGENTS="${AGENTS:-cursor,claude-code,antigravity,zed,github-copilot,codex}"
 
 IFS=',' read -r -a SKILL_ARR <<< "$SKILLS"
@@ -19,13 +19,38 @@ for a in "${AGENT_ARR[@]}"; do
   AGENT_FLAGS+=(-a "$a")
 done
 
+# Prune obsolete zombie skills from past versions
+PRUNE_LIST=(
+  "skidora-agent-handling"
+  "skidora-cd"
+  "skidora-frontend"
+  "skidora-graphifier"
+  "skidora-gsd"
+  "skidora-intake"
+  "skidora-network"
+  "skidora-planning"
+  "skidora-security"
+)
+
+AGENTS_SKILLS_DIR="$HOME/.agents/skills"
+CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
+
+echo "🧹 Pruning deprecated zombie skills..."
+for dead in "${PRUNE_LIST[@]}"; do
+  if [ -d "$AGENTS_SKILLS_DIR/$dead" ]; then
+    rm -rf "$AGENTS_SKILLS_DIR/$dead"
+    echo "  - Removed $AGENTS_SKILLS_DIR/$dead"
+  fi
+  if [ -d "$CURSOR_SKILLS_DIR/$dead" ]; then
+    rm -rf "$CURSOR_SKILLS_DIR/$dead"
+    echo "  - Removed $CURSOR_SKILLS_DIR/$dead"
+  fi
+done
+
 echo "⚡ Installing Skidora core skills via skills.sh..."
 npx --yes skills add "$ROOT" "${SKILL_FLAGS[@]}" "${AGENT_FLAGS[@]}" -g -y --copy
 
 # Ensure Cursor native discovery path (~/.cursor/skills/) is populated
-CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
-AGENTS_SKILLS_DIR="$HOME/.agents/skills"
-
 if [ -d "$HOME/.cursor" ]; then
   echo "🔗 Linking Skidora into native Cursor skills path ($CURSOR_SKILLS_DIR)..."
   mkdir -p "$CURSOR_SKILLS_DIR"

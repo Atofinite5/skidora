@@ -4,119 +4,71 @@ description: >-
   Erlang, Elixir, OTP, Phoenix, Mix, rebar. Use on BEAM repos or OTP/Phoenix/LiveView work.
 ---
 
-# Erlang and Elixir (OTP)
+# Erlang and Elixir (BEAM / OTP)
 
-Load this when the repo or request is BEAM: `mix.exs`, `rebar.config`, `erlang.mk`, `.ex` / `.exs` / `.erl` / `.hrl`, Phoenix, LiveView, OTP, GenServer, supervisor, Cowboy, Plug.
+Load this module **only** when the project contains BEAM artifacts: `mix.exs`, `rebar.config`, `erlang.mk`, `.ex`, `.exs`, `.erl`, `.hrl`, Phoenix, LiveView, OTP, GenServer, supervisor, Cowboy, or Plug.
 
-Do **not** rewrite the Skidora CLI in Erlang. Helix files stay on the `skidora` binary ([neovim-rust.md](neovim-rust.md)). This module is how the agent builds and verifies BEAM systems.
+Do **not** rewrite the Skidora CLI in Erlang. Helix single-file memory stays on `.skidora/recover.md`. This module defines how the agent builds, modifies, and verifies BEAM systems under Skidora's adaptive execution policy.
 
-## Why this module exists
+## Operating Principles on BEAM
 
-Skidora’s AG3 loop is an OTP loop:
+BEAM systems inherently embody Skidora's core principles:
 
-| Skidora | OTP |
+| Skidora Principle | BEAM / OTP Implementation |
 |---|---|
-| Intake / call | `gen_server:call` — one clear message |
-| Plan / spec | child spec — named process, restart, shutdown |
-| Execute | worker — smallest unit that can fail loudly |
-| Verify twice | probe — static (tree + router) then runtime (`mix test` / `rebar3 ct` / HTTP) |
-| Bounded retry | supervisor intensity — fix the cause, restart, stop after max restarts |
-| Graphifier | supervision tree + route graph |
+| **Surgical execution** | Minimal worker/handler diff; stop at lowest rung of 7-Rung Ladder. |
+| **Fail loudly / Let it crash** | Let unexpected faults crash the worker; supervisor restarts. Never blanket `try/rescue`. |
+| **Input errors** | User/input validation errors return tagged tuples (`{:ok, _}` / `{:error, _}`) or HTTP error responses. |
+| **Bounded retry** | Supervisor max restarts / 3-retry gate. Patch root cause before rerunning tests. |
+| **Torn resolution** | In-memory topology check (supervisor tree + router dispatch). Zero invented routes. |
 
-If the request is generic HTTP and the repo is not BEAM, use [backend.md](backend.md) only.
+If the request is generic HTTP and the repo is not BEAM, use `skidora-backend` instead.
 
-## Detect, then stay
+## Stack Detection
 
-| Evidence | Stack |
-|---|---|
-| `mix.exs` | Elixir. Prefer Mix tasks already in the repo |
-| `mix.exs` + `lib/**_web/router.ex` | Phoenix. NLP maps to the router |
-| `**/*.heex` or LiveView modules | Frontend via LiveView, then [frontend.md](frontend.md) |
-| `rebar.config` or `src/*.erl` | Erlang. Prefer `rebar3` |
-| none of the above | do not introduce OTP |
+| Evidence | Stack | Rule |
+|---|---|---|
+| `mix.exs` | Elixir | Use existing Mix tasks in repo (`mix test`, `mix compile`). |
+| `mix.exs` + `lib/**_web/router.ex` | Phoenix | NLP maps to real Phoenix router (`scope`, `get`, `post`, `live`). |
+| `**/*.heex` or LiveView modules | LiveView | Route + LiveView module + `handle_event`/template integration. |
+| `rebar.config` or `src/*.erl` | Erlang | Use `rebar3 compile`, `rebar3 eunit`, or `rebar3 ct`. |
+| None of the above | Non-BEAM | Do **not** introduce BEAM/OTP dependencies. |
 
-Never add Phoenix/OTP to a Node/Rust/Java repo unless the user P0-asks.
+Never add Phoenix/OTP to a Node/Rust/Python/Go repo unless the user explicitly requests it.
 
-## Before editing
+## Routing: NLP to Phoenix / Cowboy
 
-1. Read `mix.exs` or `rebar.config` (apps, extra_applications, deps).
-2. Find the supervision tree (`Application.start/2`, `Supervisor.child_spec`).
-3. Find the router (`*_web/router.ex`, Cowboy dispatch, or Plug pipeline).
-4. List in-scope endpoints from that router — do not invent paths.
-5. Graphifier if the tree or router is torn.
+Follow `skidora-backend` routing discipline:
+1. Extract intent + entity from the user phrase.
+2. Search `lib/**/*_web/router.ex` or Cowboy dispatch tables.
+3. If no match exists and route is requested, treat as **Blueprint Mode** (explicit route registration required).
+4. Never invent unregistered endpoints.
 
-## Architecture (show before presentation)
+## Elixir / Phoenix Implementation Guidelines
 
-Must include:
+- Contexts own domain logic; Controllers and LiveViews stay thin.
+- Use Ecto changesets (or project's existing validator) at the boundary.
+- Run `mix format` on touched files.
+- New endpoints require router entry + controller/LiveView + context + test. All must be present or it is not done.
+- Do not introduce heavy dependencies (Oban, Broadway, Nx) unless already present in `mix.exs`.
 
-- OTP tree: application → supervisors → workers (names, restart type)
-- Router → controller/live → context → store
-- Endpoints in scope (method, path, pipeline/auth, change)
-- NLP map: `"<phrase>" -> <METHOD> <path> (<module>)`
+## Dual-Pass Proof-of-Work Verification
 
-Process names and route paths must exist in files you opened.
+All structural BEAM changes require the standardized 3-line **Proof-of-Work Badge**:
 
-## OTP rules
+- **Pass A (Static):**
+  - Worker/child is registered in supervisor's child specification list.
+  - Route is registered in `router.ex` or Cowboy dispatch table (`file:line`).
+  - Test module exists and covers the route/worker.
+- **Pass B (Runtime):**
+  - Elixir: `mix test path/to/test_file.exs` -> exit code 0.
+  - Erlang: `rebar3 eunit` or `rebar3 ct` -> exit code 0.
+  - Live route (if server running): curl against endpoint verifying expected status code.
 
-- One process, one job. Do not dump business logic into the application module.
-- Let it crash for unexpected faults; supervisor restarts. Do not wrap everything in `try/rescue` / `catch`.
-- Expected user/input errors return tagged tuples (`{:ok, _}` / `{:error, _}`) or HTTP error bodies — not process death.
-- Name processes that other code must call. Do not guess a registered name.
-- Messages: typed, small, documented. No unbounded mailbox growth (no `cast` storms).
-- State: hold what the process owns. Contexts/modules stay side-effect explicit.
-- Supervisors: `one_for_one` unless the children must die together. Set intensity to match [cd-pipelines.md](cd-pipelines.md) (default 3).
-
-## NLP → Phoenix / Cowboy
-
-Same mapping as [backend.md](backend.md), with BEAM proof:
-
-1. Intent + entity from the user phrase.
-2. Match `scope` / `get` / `post` / `live` in the router, or Cowboy paths.
-3. No match → P0 (new route vs reuse). Do not silently add a pipeline.
-4. Log: `NLP: "<phrase>" -> <METHOD> <path> (<module.function>)`
-
-LiveView: the "endpoint" is the `live` route plus the handle_event names you touch.
-
-## Elixir / Phoenix implementation
-
-- Contexts own domain. Controllers/LiveViews stay thin.
-- Changesets (or the project's validator) at the boundary.
-- `mix format` on touched files. `mix credo` only if the project already uses it.
-- New endpoints: router + controller or LiveView + context + test. All three, or it is not done.
-- Do not add Umbrella/Oban/Broadway/Nx unless the repo already has them or P0 asked.
-
-## Erlang implementation
-
-- `rebar3 compile` + existing test profile (`eunit` or `ct`).
-- Follow the repo's include and app.src layout.
-- New OTP app/release only when asked or when scaffolding a BEAM project from empty.
-
-## Verify twice (95-plus)
-
-Pass A (static):
-
-- Child is in the supervisor list
-- Route is in the router
-- Test module exists or was added for this change
-
-Pass B (runtime), prefer the repo's gate:
-
-- Elixir: `mix test` (or the documented alias). Phoenix: hit the path with `mix test` request or curl against `mix phx.server` if already how this app is proven
-- Erlang: `rebar3 ct` or `rebar3 eunit` as the repo uses
-
-Second pass is a **new** run, not the first log. Coverage >= 95 only if the project reports coverage; otherwise all in-scope tests green twice.
-
-## CD
-
-- Local gate: `mix test` / `rebar3 do compile, ct` (or repo CI)
-- Release: `mix release` / `rebar3 as prod release` only if that is the project's ship path
-- Retry like a supervisor: patch the cause, rerun the same Mix/rebar command, stop after 3
-
-## Graphifier kinds (BEAM)
-
-Add when recognizing OTP:
-
-- Node kinds: `otp_app`, `supervisor`, `worker`, `route`, `liveview`, `context`
-- Edge kinds: `supervises`, `calls`, `routes`, `renders`, `broke`
-
-Torn examples: missing child spec, router path without module, LiveView `handle_event` with no template, dead `GenServer.call` name.
+Produce the Proof-of-Work Badge:
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): lib/my_app_web/router.ex:24 — Route registered in :api pipeline
+- Pass B (Runtime): mix test test/my_app_web/controllers/webhook_controller_test.exs -> exit 0
+- Regression: 24/24 tests green (0 failures)
+```

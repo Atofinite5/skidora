@@ -4,42 +4,42 @@ description: >-
   Dual-pass verification: Pass A AST file:line, Pass B command+exit runtime proof, multi-format network input parsing (Jam, HAR, Spot, curl), and bounded retry loop.
 ---
 
-# Verify & Proof-of-Work
+# Dual-Pass Verification & Proof-of-Work
 
-No completion without evidence. Recheck twice. Blueprint mode requires the standardized 3-line Proof-of-Work badge.
+Ensure work is genuinely complete before reporting success. Never accept `// TODO` placeholders or unverified diffs.
 
-## Dual-Pass Verification
+## The Dual-Pass Protocol
 
-For every endpoint, schema migration, or public contract change:
-1. **Pass A (Static AST Proof):** Identify exact `<file>:<line>` where route/schema is declared and validated.
-2. **Pass B (Runtime Execution Proof):** Run tests or execute curl/CLI command with exit code 0.
+1. **Pass A — Static Proof (AST & Routing):**
+   - Verify symbol, route, or schema definition exists in code: `path/to/file.ts:<line>`.
+   - Confirm route is registered in the router with schema validation (Zod, Pydantic, Ecto).
+2. **Pass B — Runtime Proof (Command & Exit Code):**
+   - Run the project's real test suite or execution command (e.g. `npm test`, `cargo test`, `mix test`).
+   - For public endpoints: execute a real curl command verifying exit code 0 and expected HTTP status.
+   - For secure endpoints: execute negative test (e.g. missing/invalid auth -> `401 Unauthorized`) and positive test -> `200 OK`.
 
-If Pass A and Pass B disagree, the work is NOT done.
+## The Standardized Proof-of-Work Badge
 
-## Standardized Proof-of-Work Badge
-
-See [templates/proof-of-work.md](../templates/proof-of-work.md):
+See [templates/proof-of-work.md](templates/proof-of-work.md):
 
 ```markdown
 [Skidora Proof-of-Work]
 - Pass A (Static): <file>:<line> — Route registered in router with schema validation.
-- Pass B (Runtime): <command> -> exit 0 (e.g. curl -s -o /dev/null -w "%{http_code}" <URL> -> 200 OK)
+- Pass B (Runtime): <command> -> exit 0 (e.g. curl ... bad auth -> 401, good auth -> 200 OK)
 - Regression: <X/X tests passing> (0 failures)
 ```
 
-## Multi-Format Network Debugging
+## Multi-Format Network Trace Ingestion
 
-Accept network traces in any standard format:
-- **Jam.dev Recording:** Extract failing URL, HTTP method, status code, and payload from Jam URL/metadata.
-- **HAR Dump / DevTools:** Filter entries with `response.status >= 400`. Inspect headers and response body.
-- **OpenReplay Spot:** Correlate user DOM click with network waterfall error.
-- **cURL Command:** Reproduce locally via `curl -v -X <METHOD> <URL>`.
-
-Sanitize bearer tokens and passwords before logging. Never store secrets in `.skidora/recover.md`.
+When diagnosing or verifying network issues, ingest traces across any standard format:
+- **Jam.dev URLs:** Parse reproduction link to extract failing route, status code, and request body.
+- **HAR Dumps / DevTools:** Filter entries with `response.status >= 400`.
+- **OpenReplay Spot:** Correlate user DOM clicks with network waterfall failures.
+- **cURL Commands:** Reproduce failure locally in terminal.
 
 ## Bounded CD Retry Loop
 
-If verification fails:
-1. Analyze compiler error, status code, or test failure diff.
-2. Apply minimal targeted fix using 7-Rung Ladder.
-3. Max **3 retries**. If still failing after 3 attempts, halt and mark status as `Blocked` in `.skidora/recover.md`.
+If Pass B fails:
+1. Max **3 retry attempts**.
+2. Each attempt must fix the root cause and rerun the exact same test gate.
+3. If still failing after 3 attempts: **STOP**, mark `Blocked: <evidence>` in `.skidora/recover.md`, and report findings.

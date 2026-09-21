@@ -85,7 +85,7 @@ flowchart LR
   linkStyle 2 stroke:#fb923c,stroke-width:4px
 ```
 
-Replace labels with **this repo’s** `file:line`. Keep `classDef` lines unchanged so colors stay comparable across projects.
+Replace labels with **this repo’s** `file:line`. Keep `classDef` lines unchanged so colors stay comparable across projects. Paint **both** the node (`class`) **and** the matching `linkStyle` so the connection line is the same color as the destination hop.
 
 ### 4. Cowork reply shape (always)
 

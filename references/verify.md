@@ -14,12 +14,12 @@ Blueprint Mode requires dual-pass verification and the 3-line Proof-of-Work Badg
 ## The UNVERIFIED Rule
 Pass B must quote literal command and actual output run during this turn. If not run, write `UNVERIFIED — <reason>`, never fake 200 OK or exit 0.
 
-## Network Trace & Session Debugging (Jam-if-MCP)
+## Open Trace & Network Debugging (Habitat Standard)
 
-1. **Jam MCP (When Available):** If a Jam MCP tool is present in the environment, use it to inspect session traces, DOM actions, console errors, and network payloads.
-2. **User-Pasted cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
-3. **User-Pasted HAR File / DevTools:** Filter for HTTP $\ge 400$, inspect request headers and response body.
-4. *Rule:* Never claim unauthenticated URL fetching if Jam MCP is not present.
+1. **Habitat Browser Recorder:** Open-source, serverless browser capture (`HabitatHQ/browser-recorder`). Use **"Copy as cURL"** to export failing requests instantly.
+2. **Skidora Drop-in Interceptor (`scripts/trace-interceptor.js`):** Intercepts client-side `fetch`/`XHR`, detects status $\ge 400$, and prints reproduction cURL.
+3. **Trace Extractor CLI (`scripts/trace-extract.js`):** Ingests `.har` or Habitat report files to extract failed endpoints and generate Pass B cURL commands.
+4. *Rule:* Always reproduce and verify via local cURL execution (`curl -v -X ...`).
 
 ## Bounded Retry Loop
 

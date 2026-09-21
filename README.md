@@ -11,7 +11,7 @@
 [![Agents Supported](https://img.shields.io/badge/agents-Cursor%20%7C%20Claude%20%7C%20Antigravity%20%7C%20Zed%20%7C%20Copilot-7928CA.svg?style=flat-square)](#supported-agents)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract) • [Security Transparency](#-security-audit--transparency) • [Optional Extras](#-neovim--rust-engine-optional-extras)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-open-trace--network-debugging-habitat-standard) • [Helix Memory](#-helix-single-file-memory-contract) • [Security Transparency](#-security-audit--transparency) • [Optional Extras](#-neovim--rust-engine-optional-extras)
 
 </div>
 
@@ -27,7 +27,7 @@ AI coding assistants are brilliant at syntax, but catastrophic at engineering di
 | **Context Amnesia** | Agent resets every chat turn; forgets past architecture decisions and repeats previous bugs. | **Single-File Helix Memory:** Silent, background persistence in `.skidora/recover.md`. Zero file bloat. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A cites static router/handler path:line; Pass B requires real command proof with mandatory `UNVERIFIED` fallback. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
-| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Jam-if-MCP & Hardening:** Uses Jam MCP if available, or user-pasted cURL/HAR traces; enforces explicit timeouts and CORS defense. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Habitat Open Trace & Hardening:** Intercepts fetch/XHR, auto-generates reproduction cURLs from Habitat or local sniffer; enforces explicit timeouts and CORS defense. |
 | **Code Bloat & Reinvented Wheels** | Agents install new libraries for things that take 2 lines of standard library code. | **YAGNI, KISS & DRY Enforcement:** Reuses existing utilities and stdlib; halts at the lowest rung that holds. |
 
 ---
@@ -126,32 +126,62 @@ Skidora consists of **six clean, focused markdown skills** (all markdown-only, n
 | **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, boot contract, and standalone/sibling dispatch. |
 | **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Canonical 7-Rung Ladder, SOLID, KISS ("Do it simple"), DRY ("Do it once") (≤3 lines output). |
 | **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md` (<40 lines). |
-| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification (Pass A static router path:line + Pass B command with UNVERIFIED rule), Jam-if-MCP or user traces, and 3-line badge. |
+| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification (Pass A static router path:line + Pass B command with UNVERIFIED rule), Habitat open trace or user cURL/HAR, and 3-line badge. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; in-memory torn router resolution. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (BEAM Repos Only):** Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
 
 ---
 
-## 🌐 Network Debugging & Production Security
+## 🌐 Open Trace & Network Debugging (Habitat Standard)
 
-When debugging network failures, console errors, or bug reports, Skidora agents apply the **Jam-if-MCP** protocol:
+Skidora integrates with the open-source **[Habitat Browser Recorder](https://github.com/HabitatHQ/browser-recorder)** standard for zero-friction API & network error reproduction:
 
-### Jam-if-MCP Protocol
-1. **Jam MCP (When Available):** If a Jam MCP server/tool (`jam_*`) is configured in the agent session, invoke it directly to inspect session replays, console logs, and network requests.
-2. **User-Pasted cURL Commands (CLI/Local):** Reproduce failed network traffic directly via local CLI execution (`curl -v -X <METHOD> <URL>`).
-3. **User-Pasted HAR Dumps / DevTools Logs:** Filter entries with `response.status >= 400` to pinpoint failed requests. Never hallucinate an unauthenticated web fetch if Jam MCP is not present.
+```
+┌──────────────────────────────┐
+│   Browser / Web App Crash    │
+└──────────────┬───────────────┘
+               │
+               ▼
+┌──────────────────────────────┐
+│  Habitat or Drop-in Sniffer  │ ──► Intercepts fetch/XHR, HTTP 4xx/5xx & CORS
+└──────────────┬───────────────┘     Auto-generates clean reproduction cURL
+               │
+               ▼
+┌──────────────────────────────┐
+│  Skidora Dual-Pass Verifier  │ ──► Pass A: Fixes router/handler at file:line
+└──────────────────────────────┘     Pass B: Re-executes cURL locally -> 200 OK!
+```
+
+### 1. Habitat Browser Extension (`HabitatHQ/browser-recorder`)
+* **100% Offline & Serverless:** No cloud, no account, no setup.
+* **One-Click "Copy as cURL":** Click the failed request in Habitat's network view, click "Copy as cURL", and paste directly into your agent prompt.
+
+### 2. Skidora Trace Interceptor (`scripts/trace-interceptor.js`)
+Zero-dependency client-side sniffer you can paste directly into any browser DevTools console or include in your dev bundle:
+* Automatically hooks `window.fetch` and `XMLHttpRequest`.
+* Maintains an in-memory ring buffer of the last 30 requests.
+* When any API call returns `status >= 400` or fails with CORS, it automatically logs a formatted alert with the exact runnable `curl` command.
+
+### 3. Trace Extractor CLI (`scripts/trace-extract.js`)
+Parse any `.har` file or Habitat JSON report directly in the terminal:
+```bash
+node scripts/trace-extract.js report.json
+# or pipe from stdin:
+cat network.har | node scripts/trace-extract.js -
+```
 
 ### Production Network Hardening Rules
 1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
 2. **Strict CORS Policy:** Whitelist specific origins. Never combine wildcard `*` with `credentials: true`.
-3. **Mandatory Timeouts:** Every network request must have an explicit timeout (5s–10s) and exponential backoff retry.
+3. **Mandatory Timeouts:** Every network request must declare an explicit timeout (5s–10s) and exponential backoff retry.
 4. **SSRF Defense:** Sanitize and whitelist all user-provided URLs against internal RFC 1918 subnets (`127.0.0.1`, `10.0.0.0/8`, `169.254.169.254`).
 
 ---
 
 ## 💾 Helix Single-File Memory Contract
 
-Skidora eliminates both context amnesia and markdown ceremony by keeping **one single, compact ledger** inside `.skidora/`:\n
+Skidora eliminates both context amnesia and markdown ceremony by keeping **one single, compact ledger** inside `.skidora/`:
+
 ```
 your-project/
 └── .skidora/
@@ -175,7 +205,7 @@ When `.skidora/recover.md` approaches 40 lines, prune historical lines:
 
 ## 🛡️ Security Audit & Transparency
 
-- **100% Static Markdown:** Skidora is pure agent instruction markdown. It contains zero background binaries, zero telemetry, and zero unprompted network calls.
+- **100% Static Markdown:** Skidora is pure agent instruction markdown. It contains zero background daemons, zero telemetry, and zero hidden executable binaries.
 - **Socket / Snyk Med Risk Static Analysis Note:** Automated scanners on `skills.sh` flag command syntax examples (e.g. `curl`, `npm test`, shell execution guidance) in prompt documentation as medium-risk heuristic alerts. All commands in Skidora are strictly instructions executed interactively in your developer-controlled terminal environment.
 
 ---

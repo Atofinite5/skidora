@@ -56,7 +56,7 @@ Skidora runs standalone. If sibling skills are installed, read them; otherwise e
 |---|---|---|
 | Bug fix, refactor, typo, small feature, script edit | `skidora-when-not` | Apply 7-Rung Ladder, ≤3 line diffs, zero paperwork. |
 | Session resume, crash recovery, cross-turn context | `skidora-helix` | Read/update single `.skidora/recover.md` ledger (<40 lines). |
-| Structural route, DB migration, network trace, CD | `skidora-verify` | Dual-pass proof (Pass A static router path:line + Pass B runtime command with UNVERIFIED rule), Jam-if-MCP or user traces, 3-line badge. |
+| Structural route, DB migration, network trace, CD | `skidora-verify` | Dual-pass proof (Pass A static router path:line + Pass B runtime command with UNVERIFIED rule), Habitat open trace or user cURL/HAR, 3-line badge. |
 | NLP query to backend route, torn router graph | `skidora-backend` | Map natural language to physical router code; in-memory torn router resolution. |
 | Erlang, Elixir, Phoenix, LiveView, Mix, Rebar3 | `skidora-erlang-elixir` | BEAM OTP worker/supervisor architecture & Mix test gate (BEAM repos only). |
 

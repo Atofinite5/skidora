@@ -143,12 +143,12 @@ Optional local HAR helper (not part of the installed skill pack): `scripts/trace
 
 ## 🗺️ Connection Health Map
 
-When you ask “is it wired?” or for architecture / mermaid / connections, the agent (via `skidora-backend`) scans **real** routers and replies like Claude Cowork: one status line, a mermaid, the worst hop, the next `file:line`. It does not dump `graph.md`.
+When you ask “is it wired?” or for architecture / mermaid / connections, the agent (via `skidora-backend`) **scans real routers first**. Hops start yellow. Green only after Pass B this turn. Reply: status counts (required text) + mermaid + worst hop + next `file:line`. No map unless you asked. No `graph.md`.
 
 | Color | Stroke | Meaning |
 |---|---|---|
 | **Green** | 2px | Linked and verified this turn (Pass A `file:line` + Pass B command) |
-| **Yellow** | 3px | Linked, Pass B `UNVERIFIED` |
+| **Yellow** | 3px | Default. Linked, Pass B `UNVERIFIED` this turn |
 | **Orange** | 4px | Linked but the hop is sick (missing schema, rustc warning, torn handler) |
 | **Red** | 5px | Broken (compile error, 5xx, dangling edge) |
 

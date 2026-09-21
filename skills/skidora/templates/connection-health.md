@@ -1,8 +1,12 @@
 # Connection Health Map (in-chat only)
 
-Draw this in the reply. Never write `graph.md` unless the user asked for a file.
+Draw **only when the user asked** for a map / architecture / mermaid / connections / “is it wired?”. Never write `graph.md` unless they asked for a file.
 
-Brighter / thicker stroke = more danger. No invented nodes. Every box cites a real `file:line` or is omitted.
+Scan first. Every hop starts **yellow**. One unlabeled actor (`Client`) is allowed. Every other box needs a real `file:line` from this turn’s scan.
+
+Status text is required (mermaid stroke-width may not render):
+
+`Connection health — N hops. G green / Y yellow / O orange / R red.`
 
 ```mermaid
 %%{init: {"theme":"dark"}}%%
@@ -15,27 +19,25 @@ flowchart LR
   C[Client]
   R["METHOD /path<br/>router file:line"]
   H["handler file:line"]
-  S["store / downstream file:line"]
-  C -->|ok| R
+  S["store file:line"]
+  C -->|stale| R
   R -->|stale| H
-  H -->|torn| S
-  class R ok
+  H -->|stale| S
+  class R stale
   class H stale
-  class S torn
-  linkStyle 0 stroke:#4ade80,stroke-width:2px
+  class S stale
+  linkStyle 0 stroke:#facc15,stroke-width:3px
   linkStyle 1 stroke:#facc15,stroke-width:3px
-  linkStyle 2 stroke:#fb923c,stroke-width:4px
+  linkStyle 2 stroke:#facc15,stroke-width:3px
 ```
 
-| Class | Color | Stroke | Meaning |
-|---|---|---|---|
-| `ok` | green | 2px | Linked **and** verified this turn (Pass A `file:line` + Pass B real command, or compile/test of that hop). |
-| `stale` | yellow | 3px | Linked, Pass B `UNVERIFIED`. Connection exists; proof was not run. |
-| `torn` | orange | 4px | Linked with a defect on the hop (missing schema, rustc warning, type error, handler not wired). |
-| `down` | red | 5px | Broken / danger (compile error, panic, 5xx, dangling edge, missing target). |
+Replace placeholders with this repo’s scan hits. Do not copy sample API paths. Upgrade yellow → green/orange/red only from this turn’s Pass B or compiler/test log.
 
-Reply shape (Claude cowork):
-1. One status sentence: counts per color.
-2. The mermaid.
-3. The brightest (worst) hop: `file:line` + what is wrong.
-4. Next physical edit. Stop.
+| Class | Color | Meaning |
+|---|---|---|
+| `stale` | yellow | Default. Linked; Pass B `UNVERIFIED` this turn. |
+| `ok` | green | Pass A + Pass B of that hop **this turn**. |
+| `torn` | orange | This turn’s log: warning / missing schema / unwired handler on that file. |
+| `down` | red | This turn’s log: compile error / panic / 5xx / dangling import on that file. |
+
+Reply: status counts → mermaid → brightest hop `file:line` → next edit. Stop.

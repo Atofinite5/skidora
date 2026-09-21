@@ -11,12 +11,12 @@ Zero-hallucination endpoint discipline. Canonical map stencil: [`skills/skidora/
 
 ## Connection Health Map
 
-When the user asks if wiring is done, reply in chat (Claude cowork): status sentence + mermaid + brightest hop + next `file:line`.
+When the user asks if wiring is done: scan routers first this turn; hops start yellow; reply with required status counts + mermaid + brightest hop + next `file:line`. One unlabeled actor (`Client`) is allowed. Map only on request.
 
 | Color | Stroke | Meaning |
 |---|---|---|
 | green | 2px | Linked + Pass A and Pass B this turn |
-| yellow | 3px | Linked, Pass B `UNVERIFIED` |
+| yellow | 3px | Default. Linked, Pass B `UNVERIFIED` this turn |
 | orange | 4px | Linked, defect on the hop (warning, torn handler, missing schema) |
 | red | 5px | Broken (compile error, 5xx, dangling edge) |
 

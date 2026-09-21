@@ -101,7 +101,7 @@ Triggered **only** when introducing or removing public HTTP/gRPC endpoints, data
    - Regression: <X/X tests passing> (0 failures)
    ```
 6. **Update Memory:** Append the verified milestone to `.skidora/recover.md`.
-7. **Connection Health Map (touched hops only):** After the badge, if the user asked for a map **or** you changed a public route, draw the Connection Health Map in chat (`skidora-backend` / `templates/connection-health.md`). Paint hops from this turn's Pass A/B. Do not write `graph.md`.
+7. **Connection Health Map (on request only):** Draw it only if the user asked for a map / architecture / mermaid / connections / “is it wired?”. Scan first; hops start yellow. After a public-route change with no map request, stop at the Proof-of-Work badge. Do not write `graph.md`.
 
 ---
 

@@ -3,7 +3,7 @@ name: skidora-backend
 description: >-
   Backend APIs, NLP-to-endpoint mapping, torn router resolution, and Connection Health Map.
   Use when the user asks for routes, APIs, architecture, mermaid, diagrams, connections, or whether a linkage is healthy.
-  Zero invented routes. Colored mermaid in chat: green verified, yellow unverified, orange torn, red broken.
+  Zero invented routes. Scan first. Hops start yellow. Green only after Pass B this turn.
 ---
 
 # Backend, NLP-to-Endpoints, and Connection Health Map
@@ -27,40 +27,48 @@ When a codebase has torn routes, dual backends, or conflicting middleware:
 
 ## Connection Health Map (Claude cowork reply)
 
-Trigger when the user asks to map the system, see connections, architecture, mermaid, endpoint health, or “is it wired?” Also after a Blueprint change, show the **touched** hops — not a dump of the universe.
+**Draw only when the user asked** for a map, architecture, mermaid, connections, or “is it wired?”. After a normal Blueprint route change, emit the 3-line Proof-of-Work badge only. Do not auto-dump a diagram.
 
-This is **not** Surgical Mode. Reply in chat like Claude Cowork: short prose + mermaid. Canonical stencil: hub `templates/connection-health.md`.
+This is **not** Surgical Mode. Canonical stencil: hub `templates/connection-health.md`.
 
-### 1. Evidence first (no invented boxes)
+### 1. Scan first (this turn)
 
-Scan only what exists:
+The first map action is a real search. Do not draw until it returns paths:
 
-| Hop | Evidence |
-|---|---|
-| Route | Physical router `file:line` (`app/api/**/route.ts`, `routes/*`, `router.ex`) |
-| Handler | Exported handler / controller that the route actually calls |
-| Schema | Zod / Pydantic / Ecto already on that hop |
-| Store | DB/client import the handler uses |
-| Runtime | Pass B command this turn, or `UNVERIFIED — <reason>` |
+```bash
+rg -n -g '!target/**' -g '!node_modules/**' \
+  '^(export )?(async )?(function )?(GET|POST|PUT|PATCH|DELETE)\b|router\.(get|post|put|patch|delete)|scope |get |post ' \
+  app/api routes src/routes lib --glob '*.{ts,js,ex,exs,go,rs}'
+```
 
-If a hop has no file, **omit the node**. Never draw `/api/v1/...` because it would look complete.
+Also open matching router files (`app/api/**/route.ts`, `routes/*`, `router.ex`). Quote `file:line` from that output.
 
-Cap the diagram at **12 nodes**. Prefer the requested slice or the routes changed this turn.
+If the scan finds no routers, say so and **do not invent HTTP boxes**. Map only modules that the scan (or `ls` of the requested slice) actually listed.
 
-### 2. Color = danger (brighter / thicker = worse)
+Cap at **12 nodes**. Prefer the requested slice.
 
-| Class | Color | Stroke | When |
+### 2. Default yellow, then upgrade from this turn only
+
+Every hop found by the scan starts **yellow**.
+
+| Class | Color | Stroke | Upgrade rule |
 |---|---|---|---|
-| `ok` | **green** `#4ade80` | 2px | Linked + verified this turn (Pass A `file:line` **and** Pass B real command / test of that hop). |
-| `stale` | **yellow** `#facc15` | 3px | Linked, but Pass B is `UNVERIFIED`. Connection is there; proof was not run. |
-| `torn` | **orange** `#fb923c` | 4px | Linked with a defect: missing schema, rustc warning, type error, handler not registered, test skipped. |
-| `down` | **red** `#f87171` | 5px | Broken: compile error, panic, HTTP 5xx, dangling import, missing target. |
+| `stale` | **yellow** `#facc15` | 3px | Default. Linked in code; Pass B not run this turn (`UNVERIFIED`). |
+| `ok` | **green** `#4ade80` | 2px | Pass A `file:line` **and** Pass B real command/test of **that hop this turn**. |
+| `torn` | **orange** `#fb923c` | 4px | This turn’s compiler/test log names that file as a warning, missing schema, or unwired handler. |
+| `down` | **red** `#f87171` | 5px | This turn’s log shows compile error, panic, 5xx, or dangling import for that file. |
 
-A hop that is wired **and** still wrong is **orange or red**, never green. Green is only dual-pass evidence from **this turn**.
+No log this turn → stay yellow. Never infer orange/red from “it looks risky.” Never paint green because the name looks complete.
 
-Rust / compiler / type diagnostics on a hop: warning → orange, error → red.
+### 3. Boxes
 
-### 3. Draw this mermaid (in the reply)
+- **Actor exception:** one unlabeled actor is allowed (`Client`, `Browser`, `Caller`). No `file:line`.
+- Every other box **must** cite a real `file:line` from the scan. If there is no file, **omit the node**.
+- Never copy sample paths. There is no canonical `/api/v1/billing/webhook` in this stencil.
+
+### 4. Draw (placeholders only)
+
+Paint **both** node `class` and matching `linkStyle`. Status **text** is required even if mermaid ignores stroke-width.
 
 ```mermaid
 %%{init: {"theme":"dark"}}%%
@@ -71,37 +79,39 @@ flowchart LR
   classDef down fill:#450a0a,stroke:#f87171,color:#fecaca,stroke-width:5px
 
   C[Client]
-  R["POST /api/v1/billing/webhook<br/>app/api/billing/webhook/route.ts:18"]
-  H["HMAC handler"]
-  S["store"]
-  C -->|ok| R
+  R["METHOD /path<br/>router file:line"]
+  H["handler file:line"]
+  S["store file:line"]
+  C -->|stale| R
   R -->|stale| H
-  H -->|torn| S
-  class R ok
+  H -->|stale| S
+  class R stale
   class H stale
-  class S torn
-  linkStyle 0 stroke:#4ade80,stroke-width:2px
+  class S stale
+  linkStyle 0 stroke:#facc15,stroke-width:3px
   linkStyle 1 stroke:#facc15,stroke-width:3px
-  linkStyle 2 stroke:#fb923c,stroke-width:4px
+  linkStyle 2 stroke:#facc15,stroke-width:3px
 ```
 
-Replace labels with **this repo’s** `file:line`. Keep `classDef` lines unchanged so colors stay comparable across projects. Paint **both** the node (`class`) **and** the matching `linkStyle` so the connection line is the same color as the destination hop.
+Replace `METHOD /path` and `file:line` with **this scan’s** hits. Keep every hop yellow until this turn upgrades it.
 
-### 4. Cowork reply shape (always)
+### 5. Cowork reply shape (always)
 
-1. **Status (one sentence):** `Connection health — 4 hops. 2 green, 1 yellow, 1 orange, 0 red.`
-2. **Mermaid** (above).
-3. **Brightest hop:** worst color, `file:line`, what is wrong.
-4. **Next:** the next physical edit. Then stop.
+1. **Status (required text):** `Connection health — N hops. G green / Y yellow / O orange / R red.`
+2. **Mermaid** (optional extra). If mermaid fails to color, the status line still stands.
+3. **Brightest hop:** worst color, `file:line`, what the log said — or `UNVERIFIED`.
+4. **Next:** next physical edit. Stop.
 
-Do not follow with a 400-word essay. Do not write `architecture.md` / `graph.md`.
+Do not write `architecture.md` / `graph.md`.
 
-### 5. Fail the turn if
+### 6. Fail the turn if
 
-- A node or edge is not backed by a real file (hallucinated connection).
-- A green hop did not have Pass A + Pass B (or equivalent compile/test) **this turn**.
-- Pass B was skipped and the hop was painted green instead of yellow.
-- The map was written to a markdown file the user did not ask for.
+- Drew before scanning, or copied a path not in this repo (including any sample webhook).
+- A non-actor node has no `file:line`.
+- A hop is green without Pass A + Pass B **this turn**.
+- Orange/red without this turn’s log naming that file.
+- Map drawn when the user did not ask for map / architecture / mermaid / connections / “is it wired?”.
+- Map written to a markdown file the user did not ask for.
 
 ## Backend Hardening Rules
 

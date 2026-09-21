@@ -11,7 +11,7 @@
 [![Agents Supported](https://img.shields.io/badge/agents-Cursor%20%7C%20Claude%20%7C%20Antigravity%20%7C%20Zed%20%7C%20Copilot-7928CA.svg?style=flat-square)](#supported-agents)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, YAGNI)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--jam-if-mcp) • [Helix Memory](#-helix-single-file-memory-contract) • [Security Transparency](#-security-audit--transparency) • [Optional Extras](#-neovim--rust-engine-optional-extras)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, YAGNI)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--jam-if-mcp) • [Connection Health Map](#-connection-health-map) • [Helix Memory](#-helix-single-file-memory-contract) • [Security Transparency](#-security-audit--transparency) • [Optional Extras](#-neovim--rust-engine-optional-extras)
 
 </div>
 
@@ -27,6 +27,7 @@ AI coding assistants are brilliant at syntax, but catastrophic at engineering di
 | **Context Amnesia** | Agent resets every chat turn; forgets past architecture decisions and repeats previous bugs. | **Single-File Helix Memory:** Silent, background persistence in `.skidora/recover.md`. Zero file bloat. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A cites static router/handler path:line; Pass B requires real command proof with mandatory `UNVERIFIED` fallback. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
+| **Invisible Wiring** | Senior does not want to read the whole tree; they need to see if the hop is actually connected and whether it is sick. | **Connection Health Map:** In-chat mermaid from real routers. Green = verified this turn, yellow = unverified, orange = torn, red = broken. Brighter/thicker = more danger. |
 | **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Jam-if-MCP & Hardening:** If Jam MCP is present, use it. Else pasted HAR/curl. Never ban the tool the session already has. |
 | **Code Bloat & Reinvented Wheels** | Agents install new libraries for things that take 2 lines of standard library code. | **YAGNI, KISS & DRY Enforcement:** Reuses existing utilities and stdlib; halts at the lowest rung that holds. |
 
@@ -119,7 +120,7 @@ Skidora ships **six** markdown skills (no 7th). Default install is the **4 core*
 | **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Canonical 7-Rung Ladder, KISS ("Do it simple"), DRY ("Do it once") (≤3 lines output). |
 | **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md` (<40 lines). |
 | **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification, Jam-if-MCP or pasted HAR/curl, 3-line badge. |
-| **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; in-memory torn router resolution. |
+| **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline + Health Map:** NLP → real router; torn resolution; colored mermaid (green/yellow/orange/red) in chat. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (optional):** Load only if `mix.exs` / `rebar.config` exists. |
 
 ---
@@ -137,6 +138,21 @@ Optional local HAR helper (not part of the installed skill pack): `scripts/trace
 2. **Strict CORS Policy:** Whitelist specific origins. Never combine wildcard `*` with `credentials: true`.
 3. **Mandatory Timeouts:** Every network request must declare an explicit timeout (5s–10s) and exponential backoff retry.
 4. **SSRF Defense:** Sanitize and whitelist all user-provided URLs against internal RFC 1918 subnets (`127.0.0.1`, `10.0.0.0/8`, `169.254.169.254`).
+
+---
+
+## 🗺️ Connection Health Map
+
+When you ask “is it wired?” or for architecture / mermaid / connections, the agent (via `skidora-backend`) scans **real** routers and replies like Claude Cowork: one status line, a mermaid, the worst hop, the next `file:line`. It does not dump `graph.md`.
+
+| Color | Stroke | Meaning |
+|---|---|---|
+| **Green** | 2px | Linked and verified this turn (Pass A `file:line` + Pass B command) |
+| **Yellow** | 3px | Linked, Pass B `UNVERIFIED` |
+| **Orange** | 4px | Linked but the hop is sick (missing schema, rustc warning, torn handler) |
+| **Red** | 5px | Broken (compile error, 5xx, dangling edge) |
+
+Brighter and thicker means more danger. Green is illegal without evidence from this turn. Canonical stencil: [`skills/skidora/templates/connection-health.md`](./skills/skidora/templates/connection-health.md).
 
 ---
 

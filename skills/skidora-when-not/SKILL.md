@@ -46,3 +46,4 @@ Before writing any new code, step down the ladder and **stop at the first rung t
   - Use `templates/architecture.md` and `templates/question-block.md` for P0 blockers if needed.
   - Run dual-pass verification (Pass A static router/handler path:line + Pass B runtime command with UNVERIFIED rule).
   - Produce the 3-line Proof-of-Work Badge.
+  - If the user asked for a map/diagram/connections: Connection Health Map in chat (green/yellow/orange/red). Not capped at 3 lines. Never write `graph.md`.

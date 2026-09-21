@@ -38,6 +38,7 @@ Any AI agent running under Skidora must adhere to these three behavioral traces.
   - Agent claims runtime pass without running the command (must write `UNVERIFIED` instead).
   - Agent skips negative verification on authenticated routes, or treats `x-signature: test` as valid.
   - Agent implements two competing designs instead of one P0 and wait.
+  - Agent draws a mermaid/architecture node that is not a real `file:line` in the repo, or paints a hop green without Pass A + Pass B (or `UNVERIFIED` → yellow) from this turn.
 
 ---
 

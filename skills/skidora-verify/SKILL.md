@@ -1,7 +1,7 @@
 ---
 name: skidora-verify
 description: >-
-  Dual-pass verification: Pass A static router/handler path:line, Pass B command+exit runtime proof with UNVERIFIED fallback, user trace debugging, and bounded retry loop.
+  Dual-pass verification: Pass A static router/handler path:line, Pass B command+exit runtime proof with UNVERIFIED fallback, Jam-if-MCP or user traces, and bounded retry loop.
 ---
 
 # Dual-Pass Verification & Proof-of-Work
@@ -30,12 +30,13 @@ See [templates/proof-of-work.md](templates/proof-of-work.md):
 - Regression: <X/X tests passing> (0 failures)
 ```
 
-## Network Trace Ingestion (User-Provided)
+## Network Trace & Session Debugging (Jam-if-MCP)
 
-When diagnosing or verifying network issues, inspect user-provided trace or log text:
-- **User-Pasted cURL Commands:** Reproduce failure locally in terminal with `curl -v -X <METHOD> <URL>`.
-- **User-Pasted HAR Dumps / DevTools:** Filter entries with `response.status >= 400` to inspect failing request headers and response body.
-- *Note:* Do not claim automated Jam URL fetching or proprietary DOM replay parsers; work strictly from raw text, HAR logs, or curl commands provided by the user.
+When diagnosing or verifying network and UI issues:
+1. **Jam MCP (When Available):** If a Jam MCP tool (`jam_*` or similar) is present in the agent session, call Jam MCP directly to inspect recordings, console errors, user actions, and network traces.
+2. **User-Pasted cURL Commands (CLI/Local):** Reproduce failure locally in terminal with `curl -v -X <METHOD> <URL>` to inspect headers and response codes.
+3. **User-Pasted HAR Dumps / DevTools Logs:** Filter entries with `response.status >= 400` to inspect failing request headers and response payloads.
+*Note:* If Jam MCP is not present, never claim an external automated URL fetch — rely strictly on user-pasted cURL and HAR text.
 
 ## Bounded Retry Loop
 

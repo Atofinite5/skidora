@@ -11,7 +11,7 @@
 [![Agents Supported](https://img.shields.io/badge/agents-Cursor%20%7C%20Claude%20%7C%20Antigravity%20%7C%20Zed%20%7C%20Copilot-7928CA.svg?style=flat-square)](#supported-agents)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract) • [Optional Extras](#-neovim--rust-engine-optional-extras)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract) • [Security Transparency](#-security-audit--transparency) • [Optional Extras](#-neovim--rust-engine-optional-extras)
 
 </div>
 
@@ -27,7 +27,7 @@ AI coding assistants are brilliant at syntax, but catastrophic at engineering di
 | **Context Amnesia** | Agent resets every chat turn; forgets past architecture decisions and repeats previous bugs. | **Single-File Helix Memory:** Silent, background persistence in `.skidora/recover.md`. Zero file bloat. |
 | **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A cites static router/handler path:line; Pass B requires real command proof with mandatory `UNVERIFIED` fallback. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
-| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **User Trace & Hardening Discipline:** Diagnoses user-provided curl traces and HAR logs; enforces explicit timeouts and CORS defense. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Jam-if-MCP & Hardening:** Uses Jam MCP if available, or user-pasted cURL/HAR traces; enforces explicit timeouts and CORS defense. |
 | **Code Bloat & Reinvented Wheels** | Agents install new libraries for things that take 2 lines of standard library code. | **YAGNI, KISS & DRY Enforcement:** Reuses existing utilities and stdlib; halts at the lowest rung that holds. |
 
 ---
@@ -67,21 +67,21 @@ Before writing any new code, agents must step down the ladder and **stop at the 
 Install the 6-skill Skidora pack globally across your coding agents (no CLI or binary required):
 
 ```bash
+# If upgrading from legacy v1/v2, prune obsolete zombie skills first:
+npx skills remove skidora-planning skidora-gsd skidora-network skidora-intake skidora-graphifier skidora-frontend skidora-cd skidora-security skidora-agent-handling -g -y 2>/dev/null || true
+
+# Install the canonical 6-pack:
 npx skills add Atofinite5/skidora -g -y
 ```
 
-### ⚡ For Cursor Users (Native Discovery)
-Cursor reads global skills from `~/.cursor/skills/`. Run the automated installer to install via skills.sh and link native Cursor discovery:
+### ⚡ For Cursor, Claude Code, and Codex (Automated Symlinks)
+Run our idempotent installer to register the pack with native symlink discovery across `~/.cursor/skills/`, `~/.claude/skills/`, and `~/.codex/skills/`:
 
 ```bash
 bash scripts/install.sh
 ```
 
-Or via one-liner:
-```bash
-npx skills add Atofinite5/skidora -g -y && mkdir -p ~/.cursor/skills && cp -R ~/.agents/skills/skidora* ~/.cursor/skills/
-```
-*(After installing, reload Cursor window: `Cmd + Shift + P` -> "Developer: Reload Window" or restart Cursor).*
+*(After installing, reload Cursor window: `Cmd + Shift + P` -> "Developer: Reload Window" or restart your IDE).*
 
 ### Inspect the Pack
 
@@ -91,7 +91,7 @@ npx skills add Atofinite5/skidora --list
 
 ---
 
-## 🔄 The Adaptive Execution Loop
+## 🔁 The Adaptive Execution Loop
 
 Skidora automatically routes between **Surgical Mode** (90% of daily work) and **Blueprint Mode** (10% structural work):
 
@@ -123,10 +123,10 @@ Skidora consists of **six clean, focused markdown skills** (all markdown-only, n
 
 | Skill | Module Directory | Core Capability |
 |---|---|---|
-| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, and standalone/sibling dispatch. |
+| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, boot contract, and standalone/sibling dispatch. |
 | **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Canonical 7-Rung Ladder, SOLID, KISS ("Do it simple"), DRY ("Do it once") (≤3 lines output). |
 | **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md` (<40 lines). |
-| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification (Pass A static router path:line + Pass B command with UNVERIFIED rule), user trace debugging, and 3-line badge. |
+| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification (Pass A static router path:line + Pass B command with UNVERIFIED rule), Jam-if-MCP or user traces, and 3-line badge. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; in-memory torn router resolution. |
 | **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (BEAM Repos Only):** Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
 
@@ -134,11 +134,12 @@ Skidora consists of **six clean, focused markdown skills** (all markdown-only, n
 
 ## 🌐 Network Debugging & Production Security
 
-When debugging network failures, console errors, or bug reports, Skidora agents work directly from user-provided inputs:
+When debugging network failures, console errors, or bug reports, Skidora agents apply the **Jam-if-MCP** protocol:
 
-### User Trace Support
-* **User-Pasted cURL Commands:** Reproduces failed network traffic directly via local CLI execution (`curl -v -X <METHOD> <URL>`).
-* **User-Pasted HAR Dumps / DevTools Logs:** Filters entries with `response.status >= 400` to pinpoint failed network requests without claiming external parser services.
+### Jam-if-MCP Protocol
+1. **Jam MCP (When Available):** If a Jam MCP server/tool (`jam_*`) is configured in the agent session, invoke it directly to inspect session replays, console logs, and network requests.
+2. **User-Pasted cURL Commands (CLI/Local):** Reproduce failed network traffic directly via local CLI execution (`curl -v -X <METHOD> <URL>`).
+3. **User-Pasted HAR Dumps / DevTools Logs:** Filter entries with `response.status >= 400` to pinpoint failed requests. Never hallucinate an unauthenticated web fetch if Jam MCP is not present.
 
 ### Production Network Hardening Rules
 1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
@@ -150,8 +151,7 @@ When debugging network failures, console errors, or bug reports, Skidora agents 
 
 ## 💾 Helix Single-File Memory Contract
 
-Skidora eliminates both context amnesia and markdown ceremony by keeping **one single, compact ledger** inside `.skidora/`:
-
+Skidora eliminates both context amnesia and markdown ceremony by keeping **one single, compact ledger** inside `.skidora/`:\n
 ```
 your-project/
 └── .skidora/
@@ -170,6 +170,13 @@ Instead of dumping multiple planning files, Skidora quietly appends one line upo
 When `.skidora/recover.md` approaches 40 lines, prune historical lines:
 - **Keep:** Goal, Next, Active Routes (if any), and the last 8 milestone lines.
 - **Discard:** Older milestone lines preceding the last 8.
+
+---
+
+## 🛡️ Security Audit & Transparency
+
+- **100% Static Markdown:** Skidora is pure agent instruction markdown. It contains zero background binaries, zero telemetry, and zero unprompted network calls.
+- **Socket / Snyk Med Risk Static Analysis Note:** Automated scanners on `skills.sh` flag command syntax examples (e.g. `curl`, `npm test`, shell execution guidance) in prompt documentation as medium-risk heuristic alerts. All commands in Skidora are strictly instructions executed interactively in your developer-controlled terminal environment.
 
 ---
 

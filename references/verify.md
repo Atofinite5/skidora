@@ -14,14 +14,15 @@ Blueprint Mode requires dual-pass verification and the 3-line Proof-of-Work Badg
 ## The UNVERIFIED Rule
 Pass B must quote literal command and actual output run during this turn. If not run, write `UNVERIFIED — <reason>`, never fake 200 OK or exit 0.
 
-## Network Input Parsing
+## Network Trace & Session Debugging (Jam-if-MCP)
 
-Support user-provided network debugging formats:
-1. **User-Pasted cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
-2. **User-Pasted HAR File / DevTools:** Filter for HTTP $\ge 400$, inspect request headers and response body.
+1. **Jam MCP (When Available):** If a Jam MCP tool is present in the environment, use it to inspect session traces, DOM actions, console errors, and network payloads.
+2. **User-Pasted cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
+3. **User-Pasted HAR File / DevTools:** Filter for HTTP $\ge 400$, inspect request headers and response body.
+4. *Rule:* Never claim unauthenticated URL fetching if Jam MCP is not present.
 
 ## Bounded Retry Loop
 
 - Retry failed checks up to **3 times**.
-- Each retry must follow the Stop-at-First-Rung Ladder (KISS, DRY).
+- Each retry must follow the 7-Rung Ladder (KISS, DRY).
 - If failure persists after 3 attempts, halt immediately and mark `Blocked: <reason>` in `.skidora/recover.md`.

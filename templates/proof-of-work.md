@@ -18,8 +18,3 @@ Pass B must quote a command executed during this turn. If a command was not exec
 - Regression: 18/18 tests passing (0 failures)
 ```
 *Never output a simulated exit 0 or fake 200 OK without running the command.*
-
-## Network Input Verification
-When debugging network issues, accept user-provided trace or log text:
-- **User-Pasted cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
-- **User-Pasted HAR Dump / DevTools:** Filter by status $\ge 400$, inspect failing request headers and response body.

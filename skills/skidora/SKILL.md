@@ -13,9 +13,9 @@ The unified operating system for AI coding agents. Operates in two distinct mode
                   │          USER TASK ARRIVES             │
                   └────────────────────┬───────────────────┘
                                        │
-                    Is it a public HTTP/gRPC route,          
-                    database schema migration, or            
-                    explicit user `/plan` command?           
+                    Is it a public HTTP/gRPC route,
+                    database schema migration, or
+                    explicit user `/plan` command?
                                        │
                      ┌─────────────────┴─────────────────┐
                     NO                                  YES
@@ -26,39 +26,41 @@ The unified operating system for AI coding agents. Operates in two distinct mode
         │       (90% tasks)       │         │       (10% tasks)       │
         │                         │         │                         │
         │ • 7-Rung Ladder         │         │ • 1. Load recover.md    │
-        │ • KISS & DRY slogans    │         │ • 2. Router mapping     │
-        │ • Shortest diff wins    │         │ • 3. Dual-pass proof    │
-        │ • ≤3 lines explanation  │         │ • 4. Proof-of-Work badge│
-        │ • 0 markdown dumped     │         │ • 5. Update recover.md  │
-        │ • Silent 1-line memory  │         └─────────────────────────┘
-        └─────────────────────────┘
+        │ • KISS & DRY slogans    │         │ • 2. One P0, then wait  │
+        │ • Shortest diff wins    │         │ • 3. Router mapping     │
+        │ • ≤3 lines explanation  │         │ • 4. Dual-pass proof    │
+        │ • 0 markdown dumped     │         │ • 5. Proof-of-Work badge│
+        │ • Silent 1-line memory  │         │ • 6. Update recover.md  │
+        └─────────────────────────┘         └─────────────────────────┘
 ```
 
 ---
 
 ## 1. Boot Protocol & Core Principles
 
-**Boot Directive:** If `AGENTS.md` in the target repo lacks Skidora, follow the contract (`project-kit/AGENTS.md`) anyway this turn. Never dump unrequested markdown files.
+**Boot Directive:** If `AGENTS.md` in the target repo lacks Skidora, follow the 12-line append contract (`project-kit/AGENTS.md`) this turn. Append only; never overwrite an existing counselor `AGENTS.md`. Never dump unrequested markdown files.
 
 - **KISS ("Do it simple"):** Shortest working diff wins. Stop at the lowest rung that holds.
 - **DRY ("Do it once"):** Reuse existing codebase helpers and standard libraries. Maintain **only one** memory ledger (`.skidora/recover.md`).
 - **YAGNI:** You Aren't Gonna Need It. Never generate speculative scaffolding, unrequested interfaces, or paperwork.
-- **Trace Obedience:** Follow behavioral traces in `evals/traces.md` (and concrete executions in `examples.md`); violating a trace constraint fails the turn.
+- **Trace Obedience:** Follow behavioral traces in `evals/traces.md` (and concrete executions in `examples.md`); violating a trace constraint fails the turn. These files ship inside this skill directory — missing them is a pack bug, not a reason to skip the trace.
 - **Repo Exception:** Authoring or improving Skidora itself is Blueprint mode (not capped at 3 lines).
 
 ---
 
 ## 2. Dispatch Table (The Core Skills)
 
-Skidora runs standalone. If sibling skills are installed, read them; otherwise execute inline following the core principles:
+Default `*` is the 4 core: `skidora`, `skidora-when-not`, `skidora-helix`, `skidora-verify`. `skidora-backend` is optional sibling. `skidora-erlang-elixir` loads **only** when `mix.exs` or `rebar.config` exists. Do not add a 7th skill.
+
+Skidora runs standalone. If sibling skills are installed, read them; otherwise execute inline:
 
 | Trigger Condition | Target Skill (if sibling exists, read it) | Inline Core Function |
 |---|---|---|
 | Bug fix, refactor, typo, small feature, script edit | `skidora-when-not` | Apply 7-Rung Ladder, ≤3 line diffs, zero paperwork. |
 | Session resume, crash recovery, cross-turn context | `skidora-helix` | Read/update single `.skidora/recover.md` ledger (<40 lines). |
-| Structural route, DB migration, network trace, CD | `skidora-verify` | Dual-pass proof (Pass A static router path:line + Pass B runtime command with UNVERIFIED rule), Habitat open trace or user cURL/HAR, 3-line badge. |
+| Structural route, DB migration, network trace, CD | `skidora-verify` | Dual-pass proof (Pass A static router path:line + Pass B runtime command with UNVERIFIED rule), Jam-if-MCP or pasted HAR/curl, 3-line badge. |
 | NLP query to backend route, torn router graph | `skidora-backend` | Map natural language to physical router code; in-memory torn router resolution. |
-| Erlang, Elixir, Phoenix, LiveView, Mix, Rebar3 | `skidora-erlang-elixir` | BEAM OTP worker/supervisor architecture & Mix test gate (BEAM repos only). |
+| `mix.exs` or `rebar.config` present AND Erlang/Elixir/OTP work | `skidora-erlang-elixir` | BEAM OTP worker/supervisor architecture & Mix test gate. Skip this row on non-BEAM repos. |
 
 ---
 
@@ -84,14 +86,14 @@ When the task is a bug fix, refactor, typo, single-function change, or dependenc
 
 Triggered **only** when introducing or removing public HTTP/gRPC endpoints, database schema migrations, cross-service RPC boundaries, or when user explicitly asks for `/plan`:
 1. **Load Memory:** Read `.skidora/recover.md`.
-2. **Clarify Blockers:** If essential parameters are missing, prompt via `templates/question-block.md` (P0 blockers only).
+2. **One P0, then wait:** If two valid designs exist, ask exactly one P0 question and STOP. Do not implement both. If essential parameters are missing, prompt via `templates/question-block.md` (P0 blockers only).
 3. **NLP-to-Router Mapping:** Extract real routes from physical router files (`app/api/`, `routes/`, `router.ex`). Zero invented routes. Use `templates/architecture.md` for structural alignment if needed.
 4. **Dual-Pass Verification:**
    - Pass A: Static: open the router/handler and cite `path:line`.
    - Pass B: Literal runtime command executed during this turn. For authenticated routes, test negative (bad auth -> 401) and positive -> 200.
    - **The UNVERIFIED Rule:** If a command was not executed this turn, mark Pass B `UNVERIFIED — <reason>`. Never fake an exit 0 or 200 OK.
 5. **Standardized Proof-of-Work Badge:**
-   All structural changes must supply the 3-line badge defined in `skidora-verify` (canonical template in `skidora-verify/templates/proof-of-work.md`):
+   All structural changes must supply the 3-line badge. Canonical template is this hub file `templates/proof-of-work.md` (verify points here; do not duplicate it):
    ```markdown
    [Skidora Proof-of-Work]
    - Pass A (Static): <file>:<line> — Route registered in router with schema validation.
@@ -115,7 +117,6 @@ Triggered **only** when introducing or removing public HTTP/gRPC endpoints, data
 
 ---
 
-## 6. Security & Static Analysis Transparency
+## 6. Security
 
-- **Security Assessment:** Skidora is 100% pure markdown agent instructions with zero background daemons, zero telemetry, and zero hidden executable binaries.
-- **Static Analysis Note (Socket / Snyk Med Alert):** Automated scanners flag command execution syntax (e.g. `curl`, `npm test`, shell examples) in prompt documentation as medium-risk heuristic alerts. All commands in Skidora are strictly user/agent guidance executed within the user's controlled shell environment.
+The installed skill pack is markdown agent instructions: no daemons, no telemetry, no executable binaries inside `skills/`. Optional local extras (`scripts/trace-*.js`, Rust CLI, Neovim plugin) are **not** part of `npx skills add` and must not be copied into the skill pack.

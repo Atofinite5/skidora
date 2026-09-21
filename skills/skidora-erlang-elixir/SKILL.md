@@ -1,12 +1,12 @@
 ---
 name: skidora-erlang-elixir
 description: >-
-  Erlang, Elixir, OTP, Phoenix, Mix, rebar. Use on BEAM repos or OTP/Phoenix/LiveView work.
+  BEAM only. Load IFF mix.exs or rebar.config exists in the repo. Erlang, Elixir, OTP, Phoenix, LiveView, Mix, Rebar3. Do not use on Node, Python, Rust, or Go.
 ---
 
 # Erlang and Elixir (BEAM / OTP)
 
-Load this module **only** when the project contains BEAM artifacts: `mix.exs`, `rebar.config`, `erlang.mk`, `.ex`, `.exs`, `.erl`, `.hrl`, Phoenix, LiveView, OTP, GenServer, supervisor, Cowboy, or Plug.
+Load this module **only** when `mix.exs` or `rebar.config` exists in the project root. Optional extra evidence (not sufficient alone): `erlang.mk`, `.ex`, `.exs`, `.erl`, `.hrl`, Phoenix, LiveView, OTP, GenServer, supervisor, Cowboy, or Plug. If those files are absent, skip this skill — default `*` is the 4 core.
 
 Helix single-file memory stays on `.skidora/recover.md`. This module defines how the agent builds, modifies, and verifies BEAM systems under Skidora's adaptive execution policy.
 

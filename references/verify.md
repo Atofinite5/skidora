@@ -1,8 +1,6 @@
 # Verify & Proof-of-Work Reference
 
-Blueprint Mode requires dual-pass verification and the 3-line Proof-of-Work Badge.
-
-## Standardized Badge
+Canonical badge: [`skills/skidora/templates/proof-of-work.md`](../skills/skidora/templates/proof-of-work.md)
 
 ```markdown
 [Skidora Proof-of-Work]
@@ -14,12 +12,13 @@ Blueprint Mode requires dual-pass verification and the 3-line Proof-of-Work Badg
 ## The UNVERIFIED Rule
 Pass B must quote literal command and actual output run during this turn. If not run, write `UNVERIFIED — <reason>`, never fake 200 OK or exit 0.
 
-## Open Trace & Network Debugging (Habitat Standard)
+## Network Trace (Jam-if-MCP)
 
-1. **Habitat Browser Recorder:** Open-source, serverless browser capture (`HabitatHQ/browser-recorder`). Use **"Copy as cURL"** to export failing requests instantly.
-2. **Skidora Drop-in Interceptor (`scripts/trace-interceptor.js`):** Intercepts client-side `fetch`/`XHR`, detects status $\ge 400$, and prints reproduction cURL.
-3. **Trace Extractor CLI (`scripts/trace-extract.js`):** Ingests `.har` or Habitat report files to extract failed endpoints and generate Pass B cURL commands.
-4. *Rule:* Always reproduce and verify via local cURL execution (`curl -v -X ...`).
+1. If `jam_*` / user-jam MCP tools exist in this session: use them (including Jam URL fetch). Do not refuse.
+2. Else: user-pasted HAR or curl. Filter HAR `response.status >= 400`. Reproduce locally.
+3. Never invent an unauthenticated fetch when Jam MCP is absent. Never ban Jam when it is present.
+
+Optional local extras (not in the skill pack): `scripts/trace-extract.js` parses a pasted HAR.
 
 ## Bounded Retry Loop
 

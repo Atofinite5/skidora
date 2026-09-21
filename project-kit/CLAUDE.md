@@ -1,17 +1,12 @@
-# Skidora Agent Contract
+# Skidora (append to CLAUDE.md — do not replace existing counsel)
 
-1. **Default Mode (Surgical ~90%):** Step down the **7-Rung Ladder** and stop at the first rung that holds:
-   - Rung 1: YAGNI (does this need to exist? skip if speculative)
-   - Rung 2: In Codebase (reuse existing helpers/utilities — DRY: "Do it once")
-   - Rung 3: Standard Library (use language built-ins)
-   - Rung 4: Native Platform (leverage platform/HTML/CSS/DB constraints)
-   - Rung 5: Existing Dependency (use already-installed libraries)
-   - Rung 6: One-Liner (keep it cleanly in one line — KISS: "Do it simple")
-   - Rung 7: Minimum Viable Code (write the absolute minimum safe code)
-   Shortest working diff wins. Cap explanation at ≤3 lines. Zero markdown files dumped. Silently append one line to `.skidora/recover.md`.
-2. **Structural Mode (Blueprint ~10%):** Public endpoints, schema migrations, cross-service boundaries, or `/plan` require Pass A (`path:line` in router) + Pass B (real command).
-3. **No Invented Routes:** Every endpoint must exist in a physical router file (`app/api/`, `routes/`, `router.ex`).
-4. **UNVERIFIED Rule:** In the Proof-of-Work badge, Pass B must quote literal command and output run this turn. If not run, write `UNVERIFIED — <reason>`, never fake 200 OK or exit 0.
-5. **Single Ledger:** Maintain only `.skidora/recover.md` (<40 lines). Never create `plan.md`, `draft.md`, or `graph.md`.
-6. **Negative Auth Proof:** Authenticated routes require 401 (bad/missing auth) before 200.
-7. **Trace Obedience:** Follow behavioral traces in `evals/traces.md`; violating a trace constraint fails the turn.
+This project follows the Skidora operating system.
+
+- Surgical (default ~90%): 7-Rung Ladder. Shortest working diff. ≤3 lines. Zero paperwork. One silent line in `.skidora/recover.md`.
+- Blueprint (~10%): public routes, schema migrations, or `/plan` only. Pass A `file:line` + Pass B real command (or `UNVERIFIED — <reason>`).
+- Two valid designs: ask one P0, then wait. Do not implement both.
+- No invented routes. Authenticated routes: 401 on bad auth, then 200 on valid.
+- Memory: only `.skidora/recover.md` (<40 lines). Never `plan.md`, `draft.md`, or `graph.md`.
+- Proof-of-work: 3-line badge after structural work. Never fake exit 0 or 200.
+- Traces: follow `evals/traces.md` and `examples.md`. Violating a trace fails the turn.
+- Erlang/Elixir: load `skidora-erlang-elixir` only when `mix.exs` or `rebar.config` exists.

@@ -27,15 +27,17 @@ Any AI agent running under Skidora must adhere to these three behavioral traces.
 - **Must-Match Behavior:**
   1. Read `.skidora/recover.md`.
   2. Map route directly to a physical router file in the repo (`app/api/`, `routes/`, `router.ex`).
-  3. Execute Dual-Pass Verification:
+  3. If two valid designs exist: ask one P0, then wait. Do not implement both.
+  4. Execute Dual-Pass Verification:
      - **Pass A:** Open router/handler and cite physical `path:line`.
-     - **Pass B:** Run real command from this turn (e.g. `curl -s -o /dev/null -w "%{http_code}" ...`). For authenticated routes, execute negative test (bad auth -> 401) followed by positive test (valid auth -> 200).
-  4. Provide the standardized 3-line **Proof-of-Work Badge** quoting the literal command and actual output from this turn.
-  5. **UNVERIFIED Rule:** If a runtime command was not executed in this turn (e.g. offline environment, server not running), Pass B **must** be marked `UNVERIFIED — <reason>`. Faking a 200 OK or exit 0 is an automatic turn failure.
+     - **Pass B:** Run real command from this turn. HMAC/auth routes: bad signature -> `401`; valid signature -> `200` (or `UNVERIFIED`). Never `x-signature: test` -> `200`.
+  5. Provide the standardized 3-line **Proof-of-Work Badge** quoting the literal command and actual output from this turn.
+  6. **UNVERIFIED Rule:** If a runtime command was not executed in this turn, Pass B **must** be marked `UNVERIFIED — <reason>`. Faking a 200 OK or exit 0 is an automatic turn failure.
 - **Fail The Turn If:**
   - Agent invents an unregistered route.
   - Agent claims runtime pass without running the command (must write `UNVERIFIED` instead).
-  - Agent skips negative verification on authenticated routes.
+  - Agent skips negative verification on authenticated routes, or treats `x-signature: test` as valid.
+  - Agent implements two competing designs instead of one P0 and wait.
 
 ---
 

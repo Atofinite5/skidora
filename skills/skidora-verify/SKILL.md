@@ -1,7 +1,7 @@
 ---
 name: skidora-verify
 description: >-
-  Dual-pass verification: Pass A static router/handler path:line, Pass B command+exit runtime proof with UNVERIFIED fallback, Habitat open trace debugging, and bounded retry loop.
+  Dual-pass verification: Pass A static router/handler path:line, Pass B command+exit runtime proof with UNVERIFIED fallback, Jam-if-MCP or pasted HAR/curl, and bounded retry loop.
 ---
 
 # Dual-Pass Verification & Proof-of-Work
@@ -21,7 +21,7 @@ Ensure work is genuinely complete before reporting success. Never accept `// TOD
 
 ## The Standardized Proof-of-Work Badge
 
-See [templates/proof-of-work.md](templates/proof-of-work.md):
+Canonical template: sibling hub `skidora/templates/proof-of-work.md` (do not keep a second copy here).
 
 ```markdown
 [Skidora Proof-of-Work]
@@ -30,25 +30,13 @@ See [templates/proof-of-work.md](templates/proof-of-work.md):
 - Regression: <X/X tests passing> (0 failures)
 ```
 
-## Open Trace & Network Debugging (Habitat Standard)
+## Network Trace (Jam-if-MCP)
 
-When diagnosing or verifying network failures (HTTP 4xx/5xx, CORS, timeouts), Skidora integrates with the **open-source Habitat Browser Recorder** standard:
+When diagnosing network or UI failures:
 
-1. **Habitat Browser Recorder (Extension):**
-   - Use the open-source [Habitat Browser Recorder](https://github.com/HabitatHQ/browser-recorder) to capture network and console activity.
-   - Click **"Copy as cURL"** on any failed request and paste it directly into the agent prompt.
-2. **Skidora Trace Interceptor (`scripts/trace-interceptor.js`):**
-   - Lightweight zero-dependency script pasteable into any browser DevTools console or test setup.
-   - Automatically intercepts `fetch` and `XMLHttpRequest`, maintaining a ring buffer and printing reproduction cURL commands for any request returning status $\ge 400$.
-3. **Trace Extractor CLI (`scripts/trace-extract.js`):**
-   - Parse any `.har` or Habitat JSON report:
-     ```bash
-     node scripts/trace-extract.js report.json
-     # or pipe directly:
-     cat network.har | node scripts/trace-extract.js -
-     ```
-   - Automatically extracts failing requests, pinpoints Pass A router targets, and generates Pass B cURL commands.
-4. *Rule:* Always execute the literal cURL command locally to verify the fix in Pass B. Never claim external unauthenticated URL fetches.
+1. **If `jam_*` / user-jam MCP tools exist in this session: use them.** Fetch the Jam URL, inspect replay, console, and network. Do not refuse Jam because a generic "no URL fetch" rule exists — that rule does not apply when Jam MCP is present.
+2. **Else:** reproduce from user-pasted HAR or curl. Filter HAR `response.status >= 400`. Run the curl locally.
+3. Never invent an unauthenticated web fetch when Jam MCP is absent. Never ban Jam MCP when it is present.
 
 ## Bounded Retry Loop
 

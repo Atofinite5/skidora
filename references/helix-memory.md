@@ -19,5 +19,5 @@ Helix memory provides cross-session persistence using a **single file**: `.skido
 
 ## Rules
 1. **Single File Only:** Do not create `draft.md`, `plan.md`, or `graph.md`.
-2. **Cap Size:** Keep under 40 lines. Prune completed historical milestones when approaching the limit.
+2. **Cap Size:** Keep under 40 lines. Prune older entries when approaching the limit: keep Goal, Next, Active Routes (if any), and the last 8 milestone lines.
 3. **Zero Secrets:** Never record bearer tokens, API keys, or private environment variables.

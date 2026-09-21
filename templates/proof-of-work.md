@@ -5,13 +5,21 @@ Every Blueprint change (public API, DB schema, cross-service boundary) must conc
 ```markdown
 [Skidora Proof-of-Work]
 - Pass A (Static): <file>:<line> — Route registered in router with schema validation.
-- Pass B (Runtime): <command> -> exit 0 (e.g. curl -s -o /dev/null -w "%{http_code}" <URL> -> 200 OK)
+- Pass B (Runtime): <literal command run this turn> -> <actual exit code / HTTP status>
 - Regression: <X/X tests passing> (0 failures)
 ```
 
+### The UNVERIFIED Rule
+Pass B must quote a command executed during this turn. If a command was not executed (e.g. offline, local server unavailable, no curl tool), you **MUST** write `UNVERIFIED`:
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): app/api/billing/route.ts:18 — Route registered in router with schema validation.
+- Pass B (Runtime): UNVERIFIED — Local server not running; command could not be executed this turn.
+- Regression: 18/18 tests passing (0 failures)
+```
+*Never output a simulated exit 0 or fake 200 OK without running the command.*
+
 ## Network Input Verification
-When debugging network issues, accept any of the following trace formats:
-- **Jam URL:** Extract failing endpoint, status code, and payload from Jam recording.
-- **HAR Dump / DevTools:** Filter by status $\ge 400$, inspect failing request headers and response body.
-- **OpenReplay Spot:** Match failing DOM click to network waterfall.
-- **cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
+When debugging network issues, accept user-provided trace or log text:
+- **User-Pasted cURL / CLI:** Reproduce locally with `curl -v -X <METHOD> <URL>`.
+- **User-Pasted HAR Dump / DevTools:** Filter by status $\ge 400$, inspect failing request headers and response body.

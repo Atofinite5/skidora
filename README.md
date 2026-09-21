@@ -1,18 +1,17 @@
 <div align="center">
 
-<img src="./assets/banner.png" alt="Skidora — Zero-Slop Operating System for AI Coding Agents" width="100%" />
+<img src="./assets/banner.png" alt="Skidora — Lean Operating System for AI Coding Agents" width="100%" />
 
 # Skidora 🧬
 
-**The Zero-Slop Operating System & Memory Engine for AI Coding Agents.**  
-*Eliminate agent hallucination, context amnesia, and ceremony suffocation across any IDE and model.*
+**The Lean Operating System & Memory Engine for AI Coding Agents.**  
+*Eliminate agent hallucination, context amnesia, and ceremony across any IDE and model.*
 
 [![skills.sh compatible](https://img.shields.io/badge/skills.sh-compatible-00d2ff.svg?style=flat-square)](https://skills.sh)
 [![Agents Supported](https://img.shields.io/badge/agents-Cursor%20%7C%20Claude%20%7C%20Antigravity%20%7C%20Zed%20%7C%20Copilot-7928CA.svg?style=flat-square)](#supported-agents)
-[![Tests](https://img.shields.io/badge/tests-passing-10B981.svg?style=flat-square)](#verification)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
 
-[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, 7-Rung)](#-adaptive-engine-the-7-rung-ladder--core-principles) • [AG3 Loop](#-the-adaptive-ag3-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract)
+[Quickstart](#quickstart) • [The Crisis We Solve](#the-crisis-we-solve) • [Adaptive Principles (KISS, DRY, SOLID)](#-adaptive-engine--core-principles) • [The 7-Rung Ladder](#-the-7-rung-ladder) • [Execution Loop](#-the-adaptive-execution-loop) • [Core Skills Matrix](#-core-skills-matrix) • [Network Debugging](#-network-debugging--production-security) • [Helix Memory](#-helix-single-file-memory-contract) • [Optional Extras](#-neovim--rust-engine-optional-extras)
 
 </div>
 
@@ -24,54 +23,63 @@ AI coding assistants are brilliant at syntax, but catastrophic at engineering di
 
 | The Agent Slop Problem | What Actually Happens | How Skidora Fixes It |
 |---|---|---|
-| **Ceremony Suffocation** | Agent writes 5 markdown files (`plan.md`, `architecture.md`, `artifact-index.md`) and a 400-word essay for a 1-line date fix. | **Adaptive Surgical Execution:** Default to the **Ponytail 7-Rung Ladder**. Shortest working diff, ≤3 lines response, zero paperwork. |
+| **Ceremony Suffocation** | Agent writes 5 markdown files (`plan.md`, `architecture.md`, `artifact-index.md`) and a 400-word essay for a 1-line date fix. | **Adaptive Surgical Execution:** Default to the **7-Rung Ladder** (in `skidora-when-not`). Shortest working diff, ≤3 lines response, zero paperwork. |
 | **Context Amnesia** | Agent resets every chat turn; forgets past architecture decisions and repeats previous bugs. | **Single-File Helix Memory:** Silent, background persistence in `.skidora/recover.md`. Zero file bloat. |
-| **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A checks code AST/routes; Pass B requires real shell/curl execution proof. No proof = not done. |
+| **Fake Completion** | Agent writes `// TODO: connect db` or returns hardcoded mock objects and says *"Done!"* | **Two-Pass Proof-of-Work:** Pass A cites static router/handler path:line; Pass B requires real command proof with mandatory `UNVERIFIED` fallback. |
 | **Hallucinated Endpoints** | Agent invents convenient API paths (`/api/v1/update-profile`) that don't exist in the router. | **NLP-to-Endpoint Mapping:** Strictly enforces route extraction against real code files before touching any handler. |
-| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **Multi-Format Network Ingestion:** Ingests Jam URLs, HAR dumps, OpenReplay Spot, or curl traces; enforces timeouts and CORS defense. |
+| **Networking & CORS Crashes** | Agents deploy endpoints with broken CORS, missing timeouts, or leaked auth tokens in query params. | **User Trace & Hardening Discipline:** Diagnoses user-provided curl traces and HAR logs; enforces explicit timeouts and CORS defense. |
 | **Code Bloat & Reinvented Wheels** | Agents install new libraries for things that take 2 lines of standard library code. | **YAGNI, KISS & DRY Enforcement:** Reuses existing utilities and stdlib; halts at the lowest rung that holds. |
 
 ---
 
-## 📐 Adaptive Engine: The 7-Rung Ladder & Core Principles
+## 📐 Adaptive Engine & Core Principles
 
-Skidora bakes timeless software engineering principles directly into agent prompts:
+Skidora bakes timeless software engineering principles directly into agent execution:
 
 ### The Engineering Creed
-1. **YAGNI (You Aren't Gonna Need It):** Never generate speculative abstractions or unrequested documentation files.
-2. **KISS ("Do It Simple"):** The shortest working diff that solves the root cause wins. Avoid over-engineering.
-3. **DRY ("Do It Once"):** Reuse existing codebase helpers and standard libraries. In memory, maintain **one single `.skidora/recover.md`** ledger instead of duplicating state across multiple files.
+1. **KISS ("Do it simple"):** The shortest working diff that solves the root cause wins. Stop at the lowest rung that holds.
+2. **DRY ("Do it once"):** Reuse existing codebase helpers and standard libraries. In memory, maintain **one single `.skidora/recover.md`** ledger instead of duplicating state.
+3. **YAGNI (You Aren't Gonna Need It):** Never generate speculative abstractions, unrequested classes, or paperwork files.
+4. **SOLID Architectural Discipline:** Single Responsibility per edit, Open/Closed for extensibility, Liskov substitution on replacements, Interface Segregation without forcing unused ceremonies, and Dependency Inversion on stable abstractions.
 
-### The 7-Rung Ladder of Laziness (Default Daily Driver)
-Before generating any new code, the agent steps down the ladder and **stops at the first rung that holds**:
-1. **Rung 1 — YAGNI:** Does this need to exist? If speculative, skip it.
-2. **Rung 2 — Already in codebase?** Reuse existing helpers, types, or utilities (DRY).
-3. **Rung 3 — Standard library does it?** Use built-in language primitives.
-4. **Rung 4 — Native platform covers it?** Use HTML5, native CSS, or SQL database constraints.
-5. **Rung 5 — Existing dependency solves it?** Check `package.json`, `Cargo.toml`, or `mix.exs`.
-6. **Rung 6 — Can it be a clean one-liner?** If it can be expressed clearly in one line, do so (KISS).
-7. **Rung 7 — Minimum viable code:** Write the absolute minimum safe code that fixes the root cause.
+---
+
+## 🪜 The 7-Rung Ladder
+
+Before writing any new code, agents must step down the ladder and **stop at the first rung that holds**:
+
+| Rung | Level | Action Rule |
+|---|---|---|
+| **1** | **YAGNI** | Does this need to exist? Skip if speculative or unrequested. |
+| **2** | **In Codebase** | Reuse existing helpers, types, or utilities (DRY: "Do it once"). |
+| **3** | **Standard Library** | Use language built-in primitives instead of adding packages. |
+| **4** | **Native Platform** | Leverage HTML5, CSS, or database schema constraints. |
+| **5** | **Existing Dependency** | Use libraries already declared in `package.json` / `Cargo.toml`. |
+| **6** | **One-Liner** | Keep it cleanly in one line if possible (KISS: "Do it simple"). |
+| **7** | **Minimum Viable Code** | Write the absolute minimum safe code that fixes the root cause. |
+
+> 📖 The complete ladder specification is maintained in [`skills/skidora-when-not/SKILL.md`](./skills/skidora-when-not/SKILL.md).
 
 ---
 
 ## 🚀 Quickstart
 
-Install the core Skidora pack globally across all your coding agents:
+Install the 6-skill Skidora pack globally across your coding agents (no CLI or binary required):
 
 ```bash
 npx skills add Atofinite5/skidora -g -y
 ```
 
-### ⚡ For Cursor Users (1-Line Native Install)
-Cursor reads global skills from `~/.cursor/skills/`. Run this single command to install and verify native discovery:
+### ⚡ For Cursor Users (Native Discovery)
+Cursor reads global skills from `~/.cursor/skills/`. Run the automated installer to install via skills.sh and link native Cursor discovery:
 
 ```bash
-npx skills add Atofinite5/skidora -g -y && mkdir -p ~/.cursor/skills && cp -R ~/.agents/skills/skidora* ~/.cursor/skills/
+bash scripts/install.sh
 ```
 
-*Or use the verified automated installer script:*
+Or via one-liner:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Atofinite5/skidora/main/scripts/install.sh | bash
+npx skills add Atofinite5/skidora -g -y && mkdir -p ~/.cursor/skills && cp -R ~/.agents/skills/skidora* ~/.cursor/skills/
 ```
 *(After installing, reload Cursor window: `Cmd + Shift + P` -> "Developer: Reload Window" or restart Cursor).*
 
@@ -83,7 +91,7 @@ npx skills add Atofinite5/skidora --list
 
 ---
 
-## 🔄 The Adaptive AG3 Loop
+## 🔄 The Adaptive Execution Loop
 
 Skidora automatically routes between **Surgical Mode** (90% of daily work) and **Blueprint Mode** (10% structural work):
 
@@ -91,18 +99,19 @@ Skidora automatically routes between **Surgical Mode** (90% of daily work) and *
 flowchart TD
   user["User Command"] --> isStructural{"Is it Public API Change, DB Migration, or /plan?"}
   
-  isStructural -->|No (90% Daily Work)| surgical["⚡ SURGICAL MODE (Ponytail 7-Rung Ladder)
-- YAGNI, KISS ('Do it simple'), DRY ('Do it once')
+  isStructural -->|No (90% Daily Work)| surgical["⚡ SURGICAL MODE (7-Rung Ladder)
+- Stop at the first rung that holds
+- KISS ('Do it simple'), DRY ('Do it once'), YAGNI
 - Shortest working diff wins
 - Max 3 lines of summary explanation
 - Silent 1-line append to .skidora/recover.md"]
   
-  isStructural -->|Yes (10% Structural)| blueprint["🛡️ BLUEPRINT MODE (Skidora Deep)
+  isStructural -->|Yes (10% Structural)| blueprint["🛡️ BLUEPRINT MODE
 - 1. Load Helix recover.md
-- 2. Ask missing P0 blockers
-- 3. Architecture Blueprint before presentation
-- 4. NLP-to-Endpoint mapping (real routers only)
-- 5. Dual-Pass Verification (Pass A AST + Pass B Runtime curl)
+- 2. Router mapping to real code
+- 3. Pass A: open router/handler and cite path:line
+- 4. Pass B: literal command (negative + positive) or UNVERIFIED
+- 5. 3-line Proof-of-Work badge
 - 6. Append verified milestone to recover.md"]
 ```
 
@@ -110,28 +119,26 @@ flowchart TD
 
 ## 🧩 Core Skills Matrix
 
-Skidora collapsed satellite bloat into **4 high-impact, non-contradictory core skills** (+1 optional BEAM skill):
+Skidora consists of **six clean, focused markdown skills** (all markdown-only, no CLI required):
 
 | Skill | Module Directory | Core Capability |
 |---|---|---|
-| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, and multi-skill dispatch. |
-| **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Ponytail 7-Rung Ladder, YAGNI, KISS, DRY (≤3 lines output). |
+| **`skidora`** | [`skills/skidora`](./skills/skidora) | **The Master Orchestrator:** Adaptive loop, production security, and standalone/sibling dispatch. |
+| **`skidora-when-not`** | [`skills/skidora-when-not`](./skills/skidora-when-not) | **Adaptive Gatekeeper:** Canonical 7-Rung Ladder, SOLID, KISS ("Do it simple"), DRY ("Do it once") (≤3 lines output). |
 | **`skidora-helix`** | [`skills/skidora-helix`](./skills/skidora-helix) | **Single-File Memory:** Silent, background state persistence via `.skidora/recover.md` (<40 lines). |
-| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass AST + runtime proof, network trace parsing, and 3-line badge. |
+| **`skidora-verify`** | [`skills/skidora-verify`](./skills/skidora-verify) | **Proof-of-Work:** Dual-pass verification (Pass A static router path:line + Pass B command with UNVERIFIED rule), user trace debugging, and 3-line badge. |
 | **`skidora-backend`** | [`skills/skidora-backend`](./skills/skidora-backend) | **API Discipline:** Natural-language to real router mapping; in-memory torn router resolution. |
-| **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (Optional):** Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
+| **`skidora-erlang-elixir`** | [`skills/skidora-erlang-elixir`](./skills/skidora-erlang-elixir) | **BEAM/OTP (BEAM Repos Only):** Phoenix, LiveView, Mix/Rebar3 (load only if `mix.exs`/`rebar.config` exists). |
 
 ---
 
 ## 🌐 Network Debugging & Production Security
 
-When debugging network failures, console errors, or bug reports, Skidora agents natively ingest traces in any standard format:
+When debugging network failures, console errors, or bug reports, Skidora agents work directly from user-provided inputs:
 
-### Multi-Format Input Support
-* **Jam.dev URLs:** Parses bug recording URLs to extract failing endpoints, status codes, and request bodies.
-* **HAR Dumps / DevTools:** Filters entries with `response.status >= 400` to pinpoint failed network requests.
-* **OpenReplay Spot ⭐:** Integrates DOM replay clicks with backend network waterfalls.
-* **cURL Commands:** Reproduces failed network traffic directly via local CLI execution.
+### User Trace Support
+* **User-Pasted cURL Commands:** Reproduces failed network traffic directly via local CLI execution (`curl -v -X <METHOD> <URL>`).
+* **User-Pasted HAR Dumps / DevTools Logs:** Filters entries with `response.status >= 400` to pinpoint failed network requests without claiming external parser services.
 
 ### Production Network Hardening Rules
 1. **Zero Credentials in Query Params:** Never pass API keys or bearer tokens in URLs (`/api?token=...`). Always use headers (`Authorization: Bearer <token>`).
@@ -143,7 +150,7 @@ When debugging network failures, console errors, or bug reports, Skidora agents 
 
 ## 💾 Helix Single-File Memory Contract
 
-Skidora eliminates both context amnesia AND markdown bloat by keeping **one single, compact ledger** inside `.skidora/`:
+Skidora eliminates both context amnesia and markdown ceremony by keeping **one single, compact ledger** inside `.skidora/`:
 
 ```
 your-project/
@@ -152,23 +159,28 @@ your-project/
 ```
 
 ### Clean, Silent Updates
-Instead of dumping 5 separate files, Skidora quietly appends one line upon completing verified work:
+Instead of dumping multiple planning files, Skidora quietly appends one line upon completing verified work:
 ```markdown
 # Helix Recover Ledger
 - [2026-09-18] Fixed bookingKpis day window in src/kpis.ts. (14/14 tests pass)
 - [2026-09-18] Hardened CORS whitelist on /api/v1/checkout. (Pass A & B verified)
 ```
 
+### Pruning Rule (<40 lines)
+When `.skidora/recover.md` approaches 40 lines, prune historical lines:
+- **Keep:** Goal, Next, Active Routes (if any), and the last 8 milestone lines.
+- **Discard:** Older milestone lines preceding the last 8.
+
 ---
 
-## 🦀 Neovim & Rust Engine (Optional)
+## 🦀 Neovim & Rust Engine (Optional Extras)
 
-Skidora's memory contract uses standard Markdown so any AI agent can read and write it natively with zero binary dependencies.
+Skidora requires **no CLI or binary** — all memory contracts and skills run via standard Markdown in any LLM or IDE.
 
-For terminal power users who want editor-native memory manipulation, Skidora includes a high-performance **Rust CLI** and **Neovim Lua plugin**:
+For terminal power users who want editor-native memory manipulation, Skidora includes an optional high-performance **Rust CLI** and **Neovim Lua plugin**:
 
 ```bash
-# Build the native CLI
+# Build the optional native CLI
 cargo build --release
 
 # Run CLI commands directly
@@ -190,8 +202,16 @@ Before your agent claims an API or structural feature is "finished", Skidora for
 
 ```markdown
 [Skidora Proof-of-Work]
-- Pass A (Static): POST /api/v1/billing/webhook (app/api/billing/route.ts:42)
-- Pass B (Runtime): curl -X POST http://localhost:3000/api/v1/billing/webhook -> 200 OK
+- Pass A (Static): app/api/billing/route.ts:42 — Route registered in router with schema validation.
+- Pass B (Runtime): curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/api/v1/billing -> 200 OK (exit 0)
+- Regression: 14/14 tests green (0 failures)
+```
+
+If runtime verification could not be executed this turn, the agent must output `UNVERIFIED`:
+```markdown
+[Skidora Proof-of-Work]
+- Pass A (Static): app/api/billing/route.ts:42 — Route registered in router with schema validation.
+- Pass B (Runtime): UNVERIFIED — Server not running locally during this turn.
 - Regression: 14/14 tests green (0 failures)
 ```
 

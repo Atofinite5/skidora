@@ -9,7 +9,7 @@ Three concrete traces demonstrate Skidora execution in practice.
 **User Prompt:** `fix the date parsing error in auth/token.ts`
 
 **Agent Execution:**
-1. **Ladder Check:** Steps down 7-Rung Ladder -> Rung 3 (Standard Library: `Date.parse` or native `Intl`).
+1. **Ladder Check:** Steps down the 7-Rung Ladder -> Rung 3 (Standard Library: `Date.parse` or native `Intl`).
 2. **Execution:** Surgical 4-line diff in `auth/token.ts`.
 3. **Paperwork:** Zero markdown files created. No `draft.md`, no `plan.md`.
 4. **Memory:** Appends one line to `.skidora/recover.md`:
@@ -34,10 +34,10 @@ Three concrete traces demonstrate Skidora execution in practice.
    - Unauthorized requests without valid signature return `401 Unauthorized`.
    - Authorized requests with valid signature return `200 OK`.
 4. **Dual-Pass Verification:**
-   - **Pass A (Static):** AST check (`app/api/billing/webhook/route.ts:18` registered in Next.js/Express router).
+   - **Pass A (Static):** Static: open the router/handler and cite `app/api/billing/webhook/route.ts:18` (registered in Next.js/Express router with schema validation).
    - **Pass B (Runtime - Negative & Positive Proof):**
      - Negative test (bad signature): `curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/api/v1/billing/webhook -H "x-signature: invalid" -d "{}"` -> `401 Unauthorized` (Proof of signature enforcement).
-     - Positive test (valid test HMAC): `curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/api/v1/billing/webhook -H "x-signature: <computed_hmac>" -d '{"event":"charge.succeeded"}'` -> `200 OK`.
+     - Positive test (valid test HMAC): `curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:3000/api/v1/billing/webhook -H "x-signature: <computed_hmac>"` -d '{"event":"charge.succeeded"}' -> `200 OK` (where `<computed_hmac>` is an example placeholder for the generated signature test secret).
 5. **Memory:** Append milestone to `.skidora/recover.md`:
    `- [2026-09-18] Added POST /api/v1/billing/webhook with HMAC SHA-256 validation (Pass A & B verified).`
 6. **Response to User:** Includes code diff and standardized 3-line badge:

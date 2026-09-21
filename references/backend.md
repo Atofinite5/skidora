@@ -13,4 +13,4 @@ Zero-hallucination endpoint discipline for coding agents.
 
 - **No Mock Hallucinations:** Never claim an endpoint works using fake in-memory stubs or hardcoded mocks.
 - **Single Recover Record:** Log verified routes directly into `.skidora/recover.md`.
-- **Proof-of-Work:** Pass A static AST `<file>:<line>` + Pass B runtime curl exit code 0.
+- **Proof-of-Work:** Pass A static router/handler `<file>:<line>` + Pass B runtime curl exit code 0.

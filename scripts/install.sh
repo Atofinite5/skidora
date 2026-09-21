@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Install Skidora skills via the open skills CLI and ensure native Cursor / Claude discovery.
+# Install Skidora skills via the open skills CLI and ensure native Cursor / Claude / Codex discovery.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -32,37 +32,54 @@ PRUNE_LIST=(
   "skidora-security"
 )
 
-AGENTS_SKILLS_DIR="$HOME/.agents/skills"
-CURSOR_SKILLS_DIR="$HOME/.cursor/skills"
+PRUNE_DIRS=(
+  "$HOME/.agents/skills"
+  "$HOME/.cursor/skills"
+  "$HOME/.claude/skills"
+  "$HOME/.codex/skills"
+  "$HOME/.gemini/antigravity/skills"
+)
 
-echo "🧹 Pruning deprecated zombie skills..."
-for dead in "${PRUNE_LIST[@]}"; do
-  if [ -d "$AGENTS_SKILLS_DIR/$dead" ]; then
-    rm -rf "$AGENTS_SKILLS_DIR/$dead"
-    echo "  - Removed $AGENTS_SKILLS_DIR/$dead"
-  fi
-  if [ -d "$CURSOR_SKILLS_DIR/$dead" ]; then
-    rm -rf "$CURSOR_SKILLS_DIR/$dead"
-    echo "  - Removed $CURSOR_SKILLS_DIR/$dead"
+AGENTS_SKILLS_DIR="$HOME/.agents/skills"
+
+echo "🧹 Pruning deprecated zombie skills across agent skill directories..."
+for target_dir in "${PRUNE_DIRS[@]}"; do
+  if [ -d "$target_dir" ]; then
+    for dead in "${PRUNE_LIST[@]}"; do
+      if [ -e "$target_dir/$dead" ]; then
+        rm -rf "$target_dir/$dead"
+        echo "  - Removed $target_dir/$dead"
+      fi
+    done
   fi
 done
 
 echo "⚡ Installing Skidora core skills via skills.sh..."
 npx --yes skills add "$ROOT" "${SKILL_FLAGS[@]}" "${AGENT_FLAGS[@]}" -g -y --copy
 
-# Ensure Cursor native discovery path (~/.cursor/skills/) is populated
-if [ -d "$HOME/.cursor" ]; then
-  echo "🔗 Linking Skidora into native Cursor skills path ($CURSOR_SKILLS_DIR)..."
-  mkdir -p "$CURSOR_SKILLS_DIR"
-  for s in "${SKILL_ARR[@]}"; do
-    if [ -d "$AGENTS_SKILLS_DIR/$s" ]; then
-      rm -rf "$CURSOR_SKILLS_DIR/$s"
-      cp -R "$AGENTS_SKILLS_DIR/$s" "$CURSOR_SKILLS_DIR/$s"
-    elif [ -d "$ROOT/skills/$s" ]; then
-      rm -rf "$CURSOR_SKILLS_DIR/$s"
-      cp -R "$ROOT/skills/$s" "$CURSOR_SKILLS_DIR/$s"
-    fi
-  done
-  echo "✅ Cursor native skills verified in $CURSOR_SKILLS_DIR."
-  echo "ℹ️ Please reload Cursor window (Cmd+Shift+P -> 'Developer: Reload Window') or restart Cursor."
-fi
+# Ensure all existing agent homes have all 6 core skills
+AGENT_HOMES=(
+  "$HOME/.cursor/skills"
+  "$HOME/.claude/skills"
+  "$HOME/.codex/skills"
+)
+
+echo "🔗 Ensuring 6 core skills across active agent directories..."
+for target_dir in "${AGENT_HOMES[@]}"; do
+  parent_home="$(dirname "$target_dir")"
+  if [ -d "$parent_home" ]; then
+    mkdir -p "$target_dir"
+    for s in "${SKILL_ARR[@]}"; do
+      if [ -d "$AGENTS_SKILLS_DIR/$s" ]; then
+        rm -rf "$target_dir/$s"
+        cp -R "$AGENTS_SKILLS_DIR/$s" "$target_dir/$s"
+      elif [ -d "$ROOT/skills/$s" ]; then
+        rm -rf "$target_dir/$s"
+        cp -R "$ROOT/skills/$s" "$target_dir/$s"
+      fi
+    done
+    echo "  ✅ Verified 6 skills in $target_dir"
+  fi
+done
+
+echo "🎉 Installation complete. Please reload your editor/agent window if needed."

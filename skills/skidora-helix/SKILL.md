@@ -19,7 +19,12 @@ your-project/
     └── recover.md       # Compact ledger: project goal, verified milestones, next step
 ```
 
-If `.skidora/` is missing, create it. Cap `recover.md` at **40 lines maximum**. Prune older entries when needed.
+If `.skidora/` is missing, create it. Cap `recover.md` at **40 lines maximum**.
+
+### Pruning Policy (<40 lines)
+When `recover.md` approaches the 40-line ceiling, prune older entries:
+- **Keep:** Goal, Next, Active Routes (if any), and the last 8 milestone lines.
+- **Discard:** Historical milestone lines preceding the last 8.
 
 ## Load (Every Session Start)
 
@@ -37,7 +42,7 @@ If `.skidora/` is missing, create it. Cap `recover.md` at **40 lines maximum**. 
   ```markdown
   # Project State
   - **Goal:** <primary objective>
-  - **Last Verified:** <Pass A AST + Pass B runtime command>
+  - **Last Verified:** <Pass A static router path:line + Pass B runtime command>
   - **Active Routes:** <registered endpoints>
   - **Next:** <immediate next task>
   ```

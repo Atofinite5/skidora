@@ -8,7 +8,7 @@ description: >-
 
 Load this module **only** when the project contains BEAM artifacts: `mix.exs`, `rebar.config`, `erlang.mk`, `.ex`, `.exs`, `.erl`, `.hrl`, Phoenix, LiveView, OTP, GenServer, supervisor, Cowboy, or Plug.
 
-Do **not** rewrite the Skidora CLI in Erlang. Helix single-file memory stays on `.skidora/recover.md`. This module defines how the agent builds, modifies, and verifies BEAM systems under Skidora's adaptive execution policy.
+Helix single-file memory stays on `.skidora/recover.md`. This module defines how the agent builds, modifies, and verifies BEAM systems under Skidora's adaptive execution policy.
 
 ## Operating Principles on BEAM
 

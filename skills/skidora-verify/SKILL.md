@@ -1,22 +1,23 @@
 ---
 name: skidora-verify
 description: >-
-  Dual-pass verification: Pass A AST file:line, Pass B command+exit runtime proof, multi-format network input parsing (Jam, HAR, Spot, curl), and bounded retry loop.
+  Dual-pass verification: Pass A static router/handler path:line, Pass B command+exit runtime proof with UNVERIFIED fallback, user trace debugging, and bounded retry loop.
 ---
 
 # Dual-Pass Verification & Proof-of-Work
 
-Ensure work is genuinely complete before reporting success. Never accept `// TODO` placeholders or unverified diffs.
+Ensure work is genuinely complete before reporting success. Never accept `// TODO` placeholders, simulated exit codes, or unverified diffs.
 
 ## The Dual-Pass Protocol
 
-1. **Pass A — Static Proof (AST & Routing):**
-   - Verify symbol, route, or schema definition exists in code: `path/to/file.ts:<line>`.
+1. **Pass A — Static Proof (Router & Handler `path:line`):**
+   - Static: open the router/handler and cite `path:line`.
    - Confirm route is registered in the router with schema validation (Zod, Pydantic, Ecto).
-2. **Pass B — Runtime Proof (Command & Exit Code):**
+2. **Pass B — Runtime Proof (Literal Command & Actual Output):**
    - Run the project's real test suite or execution command (e.g. `npm test`, `cargo test`, `mix test`).
-   - For public endpoints: execute a real curl command verifying exit code 0 and expected HTTP status.
-   - For secure endpoints: execute negative test (e.g. missing/invalid auth -> `401 Unauthorized`) and positive test -> `200 OK`.
+   - For public endpoints: execute a real curl command verifying exit code and expected HTTP status.
+   - For secure endpoints: execute negative test (missing/invalid auth -> `401 Unauthorized`) and positive test -> `200 OK`.
+   - **The UNVERIFIED Rule:** Pass B must quote the literal command run this turn. If no command was executed (e.g. offline, local server not running), write `UNVERIFIED — <reason>`. Never fake a 200 OK or exit 0.
 
 ## The Standardized Proof-of-Work Badge
 
@@ -25,19 +26,18 @@ See [templates/proof-of-work.md](templates/proof-of-work.md):
 ```markdown
 [Skidora Proof-of-Work]
 - Pass A (Static): <file>:<line> — Route registered in router with schema validation.
-- Pass B (Runtime): <command> -> exit 0 (e.g. curl ... bad auth -> 401, good auth -> 200 OK)
+- Pass B (Runtime): <literal command run this turn> -> <actual exit/http code> (or UNVERIFIED — <reason>)
 - Regression: <X/X tests passing> (0 failures)
 ```
 
-## Multi-Format Network Trace Ingestion
+## Network Trace Ingestion (User-Provided)
 
-When diagnosing or verifying network issues, ingest traces across any standard format:
-- **Jam.dev URLs:** Parse reproduction link to extract failing route, status code, and request body.
-- **HAR Dumps / DevTools:** Filter entries with `response.status >= 400`.
-- **OpenReplay Spot:** Correlate user DOM clicks with network waterfall failures.
-- **cURL Commands:** Reproduce failure locally in terminal.
+When diagnosing or verifying network issues, inspect user-provided trace or log text:
+- **User-Pasted cURL Commands:** Reproduce failure locally in terminal with `curl -v -X <METHOD> <URL>`.
+- **User-Pasted HAR Dumps / DevTools:** Filter entries with `response.status >= 400` to inspect failing request headers and response body.
+- *Note:* Do not claim automated Jam URL fetching or proprietary DOM replay parsers; work strictly from raw text, HAR logs, or curl commands provided by the user.
 
-## Bounded CD Retry Loop
+## Bounded Retry Loop
 
 If Pass B fails:
 1. Max **3 retry attempts**.

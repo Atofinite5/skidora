@@ -1,28 +1,24 @@
-# Architecture
+# Architecture (Blueprint Mode Only)
 
 Intent: <one sentence>
-Mode: shown-plan | hidden-plan
 
-## Layout / modules
-- <page or module> — <role>
+## Modules
+- <module> — <role>
 
-## Request flow
-1. <user/NLP>
-2. <route or UI>
-3. <handler or state>
-4. <store or API>
+## Request Flow
+1. <client / caller>
+2. <route entry>
+3. <handler / controller>
+4. <store / downstream service>
 
-## Endpoints in scope
+## Endpoints in Scope
 | Method | Path | Auth | Change |
 |---|---|---|---|
-| GET | /... | | add/edit/remove/none |
+| GET | /... | | add / edit / remove |
 
-## NLP map
-- "<phrase>" -> <METHOD> <path>
+## Verification Plan
+- Pass A (Static): open router/handler and cite <file>:<line>
+- Pass B (Runtime): <literal command run this turn> -> <actual exit/http code> (or UNVERIFIED)
 
-## Checks
-- Pass A:
-- Pass B:
-
-## Torn / risks
-- <none or list>
+## Torn State / Risks
+- <none or identified risk>
